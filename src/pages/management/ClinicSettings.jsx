@@ -53,21 +53,21 @@ export default function ClinicSettings() {
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-12">
+    <div className="space-y-8 max-w-5xl mx-auto pb-12 text-left">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-sky-600 uppercase">CLINIC PREFERENCES</span>
+          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC PREFERENCES</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Clinic Availability</h1>
-          <p className="text-sm text-slate-600 mt-1">Configure operating hours, booking rules, and holiday closures.</p>
+          <p className="text-sm text-slate-600 mt-1 font-normal">Configure operating hours, booking rules, and holiday closures.</p>
         </div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-sky-50 text-sky-700 rounded-full text-xs font-semibold border border-sky-100 shadow-2xs self-start">
-          <Settings className="w-4 h-4 text-sky-600" /> System Config
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
+          <Settings className="w-4 h-4 text-[#67c4c7]" /> System Config
         </div>
       </div>
 
-      <div className="bg-sky-50 text-sky-800 p-4 rounded-2xl text-sm flex items-start sm:items-center gap-3 border border-sky-100 shadow-2xs">
-        <Info className="w-5 h-5 shrink-0 text-sky-600 mt-0.5 sm:mt-0" />
-        <span className="font-medium leading-relaxed">
+      <div className="bg-[#67c4c7]/10 text-slate-900 p-4 rounded-2xl text-sm flex items-start sm:items-center gap-3 border border-[#67c4c7]/20 shadow-2xs">
+        <Info className="w-5 h-5 shrink-0 text-[#67c4c7] mt-0.5 sm:mt-0" />
+        <span className="font-normal leading-relaxed text-slate-700">
           One patient at a time. Available start times are offered every 15 minutes and must fit the service duration.
         </span>
       </div>
@@ -79,11 +79,11 @@ export default function ClinicSettings() {
       />
 
       {form && (
-        <form onSubmit={save} className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-8">
+        <form onSubmit={save} className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-8">
           
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <CalendarDays className="w-5 h-5 text-sky-600" />
+              <CalendarDays className="w-5 h-5 text-[#67c4c7]" />
               <h3 className="font-bold text-lg text-slate-900">Operating Days</h3>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -94,7 +94,7 @@ export default function ClinicSettings() {
                     key={day} 
                     className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border cursor-pointer transition-all text-sm font-bold ${
                       isSelected 
-                        ? 'bg-sky-50 border-sky-200 text-sky-700 shadow-2xs' 
+                        ? 'bg-[#67c4c7]/10 border-[#67c4c7]/30 text-[#67c4c7] shadow-2xs' 
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
@@ -118,7 +118,7 @@ export default function ClinicSettings() {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <Clock className="w-5 h-5 text-sky-600" />
+              <Clock className="w-5 h-5 text-[#67c4c7]" />
               <h3 className="font-bold text-lg text-slate-900">Daily Schedule</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -135,7 +135,7 @@ export default function ClinicSettings() {
                     required 
                     value={form[key]} 
                     onChange={e => setDraft({ ...form, [key]: e.target.value })} 
-                    className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition" 
+                    className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
                   />
                 </div>
               ))}
@@ -144,7 +144,7 @@ export default function ClinicSettings() {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-              <ShieldCheck className="w-5 h-5 text-sky-600" />
+              <ShieldCheck className="w-5 h-5 text-[#67c4c7]" />
               <h3 className="font-bold text-lg text-slate-900">Booking Rules</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -162,7 +162,7 @@ export default function ClinicSettings() {
                     max={max} 
                     value={form[key]} 
                     onChange={e => setDraft({ ...form, [key]: e.target.value })} 
-                    className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
+                    className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
                   />
                 </div>
               ))}
@@ -172,7 +172,7 @@ export default function ClinicSettings() {
           <div className="pt-4 border-t border-slate-100">
             <button 
               disabled={busy || !draft} 
-              className="w-full sm:w-auto px-8 py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm"
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm"
             >
               {busy ? 'Saving Changes...' : 'Save Configuration'}
             </button>
@@ -180,14 +180,14 @@ export default function ClinicSettings() {
         </form>
       )}
 
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+      <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
         <div className="flex items-start justify-between border-b border-slate-100 pb-4">
           <div>
             <div className="flex items-center gap-2">
               <CalendarX className="w-5 h-5 text-red-500" />
               <h2 className="font-bold text-lg text-slate-900">Holiday & Absence Closures</h2>
             </div>
-            <p className="text-sm text-slate-500 mt-1">Dates with active appointments must be cleared through rescheduling or cancellation first.</p>
+            <p className="text-sm text-slate-500 mt-1 font-normal">Dates with active appointments must be cleared through rescheduling or cancellation first.</p>
           </div>
         </div>
 
@@ -200,7 +200,7 @@ export default function ClinicSettings() {
               required 
               value={date} 
               onChange={e => setDate(e.target.value)} 
-              className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition" 
+              className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
             />
           </div>
           
@@ -213,7 +213,7 @@ export default function ClinicSettings() {
               value={reason} 
               onChange={e => setReason(e.target.value)} 
               placeholder="e.g., Public Holiday, Clinic Maintenance"
-              className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition" 
+              className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition" 
             />
           </div>
 
@@ -236,13 +236,13 @@ export default function ClinicSettings() {
                 className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:border-slate-300 transition"
               >
                 <div>
-                  <span className="font-bold text-slate-900 text-sm block">{c.closure_date}</span>
-                  <span className="text-xs text-slate-500 mt-0.5 block">{c.reason}</span>
+                  <span className="font-bold text-slate-900 text-sm block font-mono">{c.closure_date}</span>
+                  <span className="text-xs text-slate-500 mt-0.5 block font-normal">{c.reason}</span>
                 </div>
                 <button 
                   disabled={busy} 
                   onClick={() => closeDate(false, c.closure_date)} 
-                  className="px-4 py-2 bg-white border border-slate-200 hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700 text-slate-700 text-xs font-bold rounded-lg transition-colors shadow-2xs disabled:opacity-50"
+                  className="px-4 py-2 bg-white border border-slate-200 hover:border-[#67c4c7]/30 hover:bg-[#67c4c7]/10 hover:text-[#67c4c7] text-slate-700 text-xs font-bold rounded-lg transition-colors shadow-2xs disabled:opacity-50"
                 >
                   Reopen Date
                 </button>

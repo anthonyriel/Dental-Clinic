@@ -33,20 +33,20 @@ export default function ScheduleManagement() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-8 max-w-6xl mx-auto pb-12 text-left">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left border-b border-slate-200/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-sky-600 uppercase">CLINIC WORKSPACE</span>
+          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Schedule Management</h1>
-          <p className="text-sm text-slate-600 mt-1">Manage patient bookings, approve requests, and adjust clinic schedules.</p>
+          <p className="text-sm text-slate-600 mt-1 font-normal">Manage patient bookings, approve requests, and adjust clinic schedules.</p>
         </div>
         <button 
           onClick={schedule.refresh} 
           disabled={schedule.loading}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-50 self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-xs hover:bg-slate-50 transition-colors disabled:opacity-50 self-start sm:self-auto"
         >
-          <RefreshCw size={16} className={schedule.loading ? 'animate-spin text-sky-600' : 'text-slate-400'} />
+          <RefreshCw size={16} className={schedule.loading ? 'animate-spin text-[#67c4c7]' : 'text-slate-400'} />
           Refresh Schedule
         </button>
       </div>
@@ -58,7 +58,7 @@ export default function ScheduleManagement() {
       />
 
       {schedule.loading ? (
-        <p className="text-sm text-slate-500 py-4">Loading schedule...</p>
+        <p className="text-sm text-slate-500 font-normal py-8 text-center">Loading schedule...</p>
       ) : !schedule.error && (
         <div className="appointment-management-container">
           <AppointmentList 
@@ -69,7 +69,7 @@ export default function ScheduleManagement() {
                 {allowedActions(a).map(action => (
                   <button 
                     key={action} 
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors shadow-2xs border ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-colors shadow-2xs border ${
                       action === 'approve' || action === 'approve_cancellation' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' :
                       action === 'cancel' || action === 'reject' ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' :
                       'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -88,13 +88,13 @@ export default function ScheduleManagement() {
       {/* Action Dialog / Modal */}
       {selected && (
         <div role="dialog" aria-modal="true" aria-label="Update appointment" className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <form onSubmit={submit} className="bg-white p-6 sm:p-8 rounded-3xl max-w-lg w-full space-y-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto overflow-x-hidden">
+          <form onSubmit={submit} className="bg-white p-6 sm:p-8 rounded-3xl max-w-lg w-full space-y-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto overflow-x-hidden text-left">
             
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div>
-                <span className="text-[11px] font-bold tracking-wider text-sky-600 uppercase">UPDATE APPOINTMENT</span>
+                <span className="text-[10px] font-bold tracking-wider text-[#67c4c7] uppercase">UPDATE APPOINTMENT</span>
                 <h2 className="text-xl font-extrabold text-slate-900 capitalize mt-1">{statusLabel(selected.action)}</h2>
-                <p className="text-sm text-slate-500 font-medium mt-1">
+                <p className="text-xs text-slate-500 font-medium mt-1 font-mono">
                   {selected.appointment.appointment_date} · {selected.appointment.time_slot}
                 </p>
               </div>
@@ -130,7 +130,7 @@ export default function ScheduleManagement() {
                 value={reason} 
                 onChange={e => setReason(e.target.value)} 
                 placeholder="Enter the reason or note for this action..."
-                className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-900 bg-slate-50/50 resize-none" 
+                className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 resize-none transition" 
                 rows={4}
               />
             </label>
@@ -150,7 +150,7 @@ export default function ScheduleManagement() {
                 className={`flex-1 py-3 font-bold rounded-xl transition shadow-md text-sm disabled:opacity-50 text-white ${
                   selected.action === 'approve' || selected.action === 'approve_cancellation' ? 'bg-emerald-600 hover:bg-emerald-500' :
                   selected.action === 'cancel' || selected.action === 'reject' ? 'bg-red-600 hover:bg-red-500' :
-                  'bg-sky-600 hover:bg-sky-500'
+                  'bg-[#67c4c7] hover:bg-[#57b3b6]'
                 }`}
               >
                 {busy ? 'Processing...' : 'Confirm Change'}

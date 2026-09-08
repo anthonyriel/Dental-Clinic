@@ -81,105 +81,112 @@ export default function Signup() {
   }
 
   return (
-    <div className="signup-page">
-      <div className="max-w-2xl w-full bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Create an Account</h2>
-          <p className="text-sm text-slate-500 mt-1">Join Dentaprime to book and manage your appointments</p>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-6 lg:p-8 selection:bg-[#67c4c7]/30 py-12">
+      <div className="max-w-3xl w-full bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-8 sm:p-12 shadow-xl space-y-8">
+        
+        <div className="text-center space-y-1">
+          <span className="text-[10px] font-bold tracking-widest text-[#67c4c7] uppercase">JOIN DENTAPRIME</span>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">Create an Account</h2>
+          <p className="text-sm text-slate-500 font-normal">Join Dentaprime to book and manage your appointments</p>
         </div>
 
-        {message && <p role="status" className="bg-emerald-50 p-4 rounded-xl">{message}</p>}
-        {error && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 shrink-0" />
-            <span>{error}</span>
+        {message && (
+          <div role="status" className="bg-emerald-50 text-emerald-800 p-4 rounded-2xl text-sm border border-emerald-200 font-medium">
+            {message}
           </div>
         )}
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {error && (
+          <div className="bg-red-50 text-red-700 p-4 rounded-2xl text-sm flex items-center gap-3 border border-red-200">
+            <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
+            <span className="font-medium">{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSignup} className="space-y-6 text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Username <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <AtSign className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                <AtSign className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
                   name="username"
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                   placeholder="juandelacruz"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Full Name <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                <User className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
                   name="fullName"
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                   placeholder="Juan Dela Cruz"
                 />
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Email Address <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                <Mail className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
                 <input
                   type="email"
                   name="email"
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                   placeholder="you@example.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                <Lock className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
                 <input
                   type="password"
                   name="password"
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                   placeholder="••••••••"
                 />
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Phone Number <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                <Phone className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
                   name="phone"
@@ -188,18 +195,18 @@ export default function Signup() {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                   placeholder="09123456789"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Birthdate <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                <Calendar className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
                 <input
                   type="date"
                   name="birthdate"
@@ -207,20 +214,20 @@ export default function Signup() {
                   required
                   value={formData.birthdate}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none bg-white"
+                  className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Gender <span className="text-red-500">*</span>
               </label>
               <select
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none bg-white"
+                className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
               >
                 <option value="Female">Female</option>
                 <option value="Male">Male</option>
@@ -231,17 +238,17 @@ export default function Signup() {
           </div>
 
           {/* Address Section */}
-          <div className="border-t border-slate-200 pt-4 space-y-4">
-            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-sky-600" /> Philippine Address Directory
+          <div className="border-t border-slate-100 pt-6 space-y-4">
+            <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-[#67c4c7]" /> Philippine Address Directory
             </h3>
 
             <AddressFields value={formData} onChange={changes => setFormData(prev => ({ ...prev, ...changes }))} />
 
             {/* Optional street details & Zipcode */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pt-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                   House / Bldg No.
                 </label>
                 <input
@@ -249,13 +256,13 @@ export default function Signup() {
                   name="houseNumber"
                   value={formData.houseNumber}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                   placeholder="e.g. Blk 4 Lot 12"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                   Street Name
                 </label>
                 <input
@@ -263,13 +270,13 @@ export default function Signup() {
                   name="streetName"
                   value={formData.streetName}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                   placeholder="e.g. Rizal Street"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                   Subdivision or Purok 
                 </label>
                 <input
@@ -277,13 +284,13 @@ export default function Signup() {
                   name="subdivisionPurok"
                   value={formData.subdivisionPurok}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                  className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                   placeholder="e.g. Purok 3"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                   Zipcode <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -294,7 +301,7 @@ export default function Signup() {
                   required
                   value={formData.zipcode}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none font-mono"
+                  className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                   placeholder="e.g. 6328"
                 />
               </div>
@@ -304,15 +311,15 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-sky-600 text-white font-medium rounded-xl hover:bg-sky-700 transition shadow-sm disabled:opacity-50 text-sm mt-4"
+            className="w-full py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold rounded-xl transition shadow-md disabled:opacity-50 text-sm mt-4"
           >
             {loading ? 'Creating account...' : 'Complete Sign Up'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-center text-sm text-slate-500 font-normal">
           Already have an account?{' '}
-          <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'} className="text-sky-600 font-medium hover:underline">
+          <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'} className="text-[#67c4c7] font-bold hover:underline">
             Sign in
           </Link>
         </p>

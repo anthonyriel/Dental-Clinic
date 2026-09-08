@@ -52,25 +52,25 @@ export default function ServicesManagement() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left border-b border-slate-200/80 pb-6">
+    <div className="space-y-8 max-w-6xl mx-auto pb-12 text-left">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-sky-600 uppercase">CLINIC CATALOG</span>
+          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC CATALOG</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Services Management</h1>
-          <p className="text-sm text-slate-600 mt-1">Configure treatment offerings, pricing estimates, and active booking availability.</p>
+          <p className="text-sm text-slate-600 mt-1 font-normal">Configure treatment offerings, pricing estimates, and active booking availability.</p>
         </div>
       </div>
 
       <Feedback error={error || services.error} onRetry={() => { setError(''); services.refresh() }} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <form ref={formRef} onSubmit={save} className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-5 shadow-sm lg:sticky lg:top-6">
+        <form ref={formRef} onSubmit={save} className="bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-3xl p-6 sm:p-8 space-y-5 shadow-sm lg:sticky lg:top-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <h2 className="font-bold text-lg text-slate-900 flex items-center gap-2">
-              <Tag className="w-5 h-5 text-sky-600" /> {editing ? 'Edit Service' : 'Add New Service'}
+              <Tag className="w-5 h-5 text-[#67c4c7]" /> {editing ? 'Edit Service' : 'Add New Service'}
             </h2>
             {editing && (
-              <span className="text-xs font-semibold px-2.5 py-1 bg-sky-50 text-sky-700 rounded-full border border-sky-100">
+              <span className="text-xs font-bold px-2.5 py-1 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full border border-[#67c4c7]/20">
                 Editing Mode
               </span>
             )}
@@ -84,7 +84,7 @@ export default function ServicesManagement() {
               value={form.name} 
               onChange={e => setForm({ ...form, name: e.target.value })} 
               placeholder="e.g., Dental Consultation" 
-              className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-900 bg-slate-50/50" 
+              className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 transition" 
             />
           </label>
 
@@ -97,7 +97,7 @@ export default function ServicesManagement() {
               value={form.description} 
               onChange={e => setForm({ ...form, description: e.target.value })} 
               placeholder="Detailed overview of the procedure..." 
-              className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-900 bg-slate-50/50 resize-none" 
+              className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 resize-none transition" 
             />
           </label>
 
@@ -112,7 +112,7 @@ export default function ServicesManagement() {
                 value={form.price} 
                 onChange={e => setForm({ ...form, price: e.target.value })} 
                 placeholder="500" 
-                className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-900 bg-slate-50/50 font-mono" 
+                className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 font-mono transition" 
               />
             </label>
 
@@ -127,7 +127,7 @@ export default function ServicesManagement() {
                 value={form.duration_minutes} 
                 onChange={e => setForm({ ...form, duration_minutes: e.target.value })} 
                 placeholder="60" 
-                className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-slate-900 bg-slate-50/50 font-mono" 
+                className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 font-mono transition" 
               />
             </label>
           </div>
@@ -135,7 +135,7 @@ export default function ServicesManagement() {
           <div className="flex items-center gap-3 pt-2">
             <button 
               disabled={busy} 
-              className="flex-1 py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl transition shadow-md text-sm disabled:opacity-50"
+              className="flex-1 py-3 bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold rounded-xl transition shadow-md text-sm disabled:opacity-50"
             >
               {busy ? 'Saving...' : editing ? 'Update Service' : 'Save Service'}
             </button>
@@ -154,16 +154,16 @@ export default function ServicesManagement() {
 
         <div className="lg:col-span-2 space-y-4">
           {services.loading ? (
-            <p className="text-sm text-slate-500">Loading services...</p>
+            <p className="text-sm text-slate-500 font-normal py-8 text-center">Loading services...</p>
           ) : !services.error && (
             services.data.map(service => (
-              <article key={service.id} className={`bg-white border rounded-3xl p-6 space-y-3 shadow-sm transition ${service.is_active === false ? 'opacity-60 border-slate-200 bg-slate-50/50' : 'border-slate-200/90 hover:border-sky-300'}`}>
+              <article key={service.id} className={`bg-white/90 backdrop-blur-md border rounded-3xl p-6 space-y-3 shadow-sm transition ${service.is_active === false ? 'opacity-60 border-slate-200 bg-slate-50/50' : 'border-slate-200/90 hover:border-[#67c4c7]/50'}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 className="font-bold text-lg text-slate-900 flex items-center gap-2">
                       {service.name} 
                       {service.is_active === false && (
-                        <span className="text-[11px] font-semibold px-2.5 py-0.5 bg-amber-100 text-amber-800 rounded-full">Archived</span>
+                        <span className="text-[11px] font-bold px-2.5 py-0.5 bg-amber-100 text-amber-800 rounded-full border border-amber-200">Archived</span>
                       )}
                     </h2>
                     <p className="text-xs text-slate-500 font-mono mt-1 flex items-center gap-3">
@@ -174,20 +174,20 @@ export default function ServicesManagement() {
                   </div>
                 </div>
 
-                <p className="text-sm text-slate-600 leading-relaxed">{service.description}</p>
+                <p className="text-sm text-slate-600 font-normal leading-relaxed">{service.description}</p>
 
-                <div className="flex items-center gap-4 pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-4 pt-3 border-t border-slate-100">
                   <button 
                     disabled={busy} 
                     onClick={() => handleStartEdit(service)} 
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-600 hover:text-sky-700"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#67c4c7] hover:underline"
                   >
                     <Edit3 size={15}/> Edit Details
                   </button>
                   <button 
                     disabled={busy} 
                     onClick={() => toggle(service)} 
-                    className={`inline-flex items-center gap-1.5 text-xs font-bold ${service.is_active === false ? 'text-emerald-600 hover:text-emerald-700' : 'text-red-600 hover:text-red-700'}`}
+                    className={`inline-flex items-center gap-1.5 text-xs font-bold ${service.is_active === false ? 'text-emerald-600 hover:underline' : 'text-red-600 hover:underline'}`}
                   >
                     {service.is_active === false ? <><RotateCcw size={15}/> Restore Service</> : <><Archive size={15}/> Archive Service</>}
                   </button>

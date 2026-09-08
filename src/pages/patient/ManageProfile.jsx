@@ -3,9 +3,9 @@ import { supabase } from '../../services/supabaseClient'
 import { useAuth } from '../../context/auth'
 import AddressFields from '../../components/AddressFields'
 import { clinicDate } from '../../lib/appointments'
-import { 
-  User, Phone, Calendar, MapPin, Lock, Camera, 
-  AlertCircle, CheckCircle2, AtSign, Mail, ZoomIn, Check, X, Sliders, ShieldCheck 
+import {  
+  User, Phone, Calendar, MapPin, Lock, Camera,  
+  AlertCircle, CheckCircle2, AtSign, Mail, ZoomIn, Check, X, Sliders, ShieldCheck  
 } from 'lucide-react'
 
 export default function ManageProfile() {
@@ -200,16 +200,16 @@ export default function ManageProfile() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 pb-12">
+    <div className="max-w-3xl mx-auto space-y-8 pb-12 text-left">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-sky-600 uppercase">ACCOUNT SETTINGS</span>
+          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">ACCOUNT SETTINGS</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Manage Profile</h1>
-          <p className="text-sm text-slate-600 mt-1">Update your professional profile credentials, residential address, and security settings.</p>
+          <p className="text-sm text-slate-600 mt-1 font-normal">Update your professional profile credentials, residential address, and security settings.</p>
         </div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-sky-50 text-sky-700 rounded-full text-xs font-semibold border border-sky-100 shadow-2xs self-start">
-          <ShieldCheck className="w-4 h-4 text-sky-600" /> Secure Portal
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
+          <ShieldCheck className="w-4 h-4 text-[#67c4c7]" /> Secure Portal
         </div>
       </div>
 
@@ -232,13 +232,13 @@ export default function ManageProfile() {
         <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl space-y-6 shadow-xl border border-slate-800">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <h3 className="font-bold text-lg flex items-center gap-2 text-white">
-              <Camera className="w-5 h-5 text-sky-400" /> Adjust & Crop Profile Picture
+              <Camera className="w-5 h-5 text-[#67c4c7]" /> Adjust & Crop Profile Picture
             </h3>
             <span className="text-xs text-slate-400">Position your image perfectly</span>
           </div>
 
           <div className="flex flex-col items-center justify-center space-y-6">
-            <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-sky-500/80 bg-slate-950 flex items-center justify-center shadow-2xl">
+            <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-[#67c4c7]/80 bg-slate-950 flex items-center justify-center shadow-2xl">
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <img 
                   src={rawImageSrc} 
@@ -256,8 +256,8 @@ export default function ManageProfile() {
 
             <div className="w-full max-w-md space-y-4 bg-slate-800/60 p-5 rounded-2xl border border-slate-700/80 backdrop-blur-md">
               <div className="flex items-center justify-between text-xs font-bold text-slate-300">
-                <span className="flex items-center gap-1.5"><ZoomIn className="w-4 h-4 text-sky-400" /> Zoom Level</span>
-                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-sky-400">{zoom.toFixed(2)}x</span>
+                <span className="flex items-center gap-1.5"><ZoomIn className="w-4 h-4 text-[#67c4c7]" /> Zoom Level</span>
+                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-[#67c4c7]">{zoom.toFixed(2)}x</span>
               </div>
               <input 
                 type="range" 
@@ -266,7 +266,7 @@ export default function ManageProfile() {
                 step="0.05" 
                 value={zoom} 
                 onChange={(e) => setZoom(parseFloat(e.target.value))} 
-                className="w-full accent-sky-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
+                className="w-full accent-[#67c4c7] cursor-pointer h-2 bg-slate-900 rounded-lg"
               />
 
               <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-700/60">
@@ -278,7 +278,7 @@ export default function ManageProfile() {
                     max="150" 
                     value={panX} 
                     onChange={(e) => setPanX(parseInt(e.target.value))} 
-                    className="w-full accent-sky-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
+                    className="w-full accent-[#67c4c7] cursor-pointer h-2 bg-slate-900 rounded-lg"
                   />
                 </div>
                 <div>
@@ -289,7 +289,7 @@ export default function ManageProfile() {
                     max="150" 
                     value={panY} 
                     onChange={(e) => setPanY(parseInt(e.target.value))} 
-                    className="w-full accent-sky-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
+                    className="w-full accent-[#67c4c7] cursor-pointer h-2 bg-slate-900 rounded-lg"
                   />
                 </div>
               </div>
@@ -307,7 +307,7 @@ export default function ManageProfile() {
                 type="button"
                 disabled={uploadingAvatar}
                 onClick={handleSaveCroppedImage}
-                className="flex-1 py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-bold text-xs transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-3 bg-[#67c4c7] hover:bg-[#57b3b6] text-white rounded-xl font-bold text-xs transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <Check className="w-4 h-4" /> {uploadingAvatar ? 'Saving Avatar...' : 'Crop & Save Image'}
               </button>
@@ -317,11 +317,11 @@ export default function ManageProfile() {
       )}
 
       {/* Main Profile Details Form */}
-      <form onSubmit={handleUpdateProfile} className="bg-white p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-8">
+      <form onSubmit={handleUpdateProfile} className="bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-8">
         
         {/* Avatar Header Component */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-slate-100 text-center sm:text-left">
-          <div className="relative w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-4 border-sky-500 shadow-inner shrink-0 flex items-center justify-center">
+          <div className="relative w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-4 border-[#67c4c7] shadow-inner shrink-0 flex items-center justify-center">
             {formData.avatarUrl ? (
               <img src={formData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
@@ -331,10 +331,10 @@ export default function ManageProfile() {
           <div className="space-y-3 flex-1">
             <div>
               <h3 className="font-bold text-slate-900 text-base">Profile Photograph</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Upload a professional portrait or clear photo for your clinic profile.</p>
+              <p className="text-xs text-slate-500 mt-0.5 font-normal">Upload a professional portrait or clear photo for your clinic profile.</p>
             </div>
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-              <label className="inline-flex items-center gap-2 px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl text-xs font-bold cursor-pointer transition border border-sky-200/60 shadow-2xs">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#67c4c7]/10 hover:bg-[#67c4c7]/20 text-[#67c4c7] rounded-xl text-xs font-bold cursor-pointer transition border border-[#67c4c7]/30 shadow-2xs">
                 <Camera className="w-4 h-4" />
                 <span>Upload New Image</span>
                 <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
@@ -370,7 +370,7 @@ export default function ManageProfile() {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition font-medium text-slate-900 bg-slate-50/50"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none transition font-normal text-slate-900 bg-slate-50/50"
                 />
               </div>
             </div>
@@ -387,7 +387,7 @@ export default function ManageProfile() {
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition font-medium text-slate-900 bg-slate-50/50"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none transition font-normal text-slate-900 bg-slate-50/50"
                 />
               </div>
             </div>
@@ -402,7 +402,7 @@ export default function ManageProfile() {
                   type="email"
                   disabled
                   value={formData.email}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-100/80 text-slate-500 cursor-not-allowed font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-100/80 text-slate-500 cursor-not-allowed font-normal"
                 />
               </div>
             </div>
@@ -421,7 +421,7 @@ export default function ManageProfile() {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition font-medium text-slate-900 bg-slate-50/50"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none transition font-normal text-slate-900 bg-slate-50/50 font-mono"
                 />
               </div>
             </div>
@@ -441,7 +441,7 @@ export default function ManageProfile() {
                   required
                   value={formData.birthdate}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 font-medium text-slate-900"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 font-normal text-slate-900"
                 />
               </div>
             </div>
@@ -454,7 +454,7 @@ export default function ManageProfile() {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 font-medium text-slate-900"
+                className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 font-normal text-slate-900"
               >
                 <option value="Female">Female</option>
                 <option value="Male">Male</option>
@@ -469,7 +469,7 @@ export default function ManageProfile() {
         <div className="border-t border-slate-200/80 pt-6 space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-sky-600" /> Philippine Address Directory
+              <MapPin className="w-4 h-4 text-[#67c4c7]" /> Philippine Address Directory
             </h4>
             <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">
               Saved Region: {formData.regionName || 'None selected'}
@@ -490,7 +490,7 @@ export default function ManageProfile() {
                 name="houseNumber"
                 value={formData.houseNumber}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none font-normal text-slate-900 bg-slate-50/50"
               />
             </div>
 
@@ -503,7 +503,7 @@ export default function ManageProfile() {
                 name="streetName"
                 value={formData.streetName}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none font-normal text-slate-900 bg-slate-50/50"
               />
             </div>
 
@@ -516,7 +516,7 @@ export default function ManageProfile() {
                 name="subdivisionPurok"
                 value={formData.subdivisionPurok}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none font-normal text-slate-900 bg-slate-50/50"
               />
             </div>
 
@@ -532,7 +532,7 @@ export default function ManageProfile() {
                 required
                 value={formData.zipcode}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-mono font-bold text-slate-900 bg-slate-50/50"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none font-mono font-normal text-slate-900 bg-slate-50/50"
               />
             </div>
           </div>
@@ -541,21 +541,21 @@ export default function ManageProfile() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 bg-sky-600 text-white font-bold rounded-xl hover:bg-sky-500 transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm mt-6"
+          className="w-full py-3.5 bg-[#67c4c7] text-white font-bold rounded-xl hover:bg-[#57b3b6] transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm mt-6"
         >
           {loading ? 'Saving Profile Changes...' : 'Save Profile Changes'}
         </button>
       </form>
 
       {/* Change Password Form */}
-      <form onSubmit={handlePasswordChange} className="bg-white p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+      <form onSubmit={handlePasswordChange} className="bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
           <div className="p-2.5 rounded-xl bg-slate-900 text-white">
             <Lock className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-900">Security Credentials</h3>
-            <p className="text-xs text-slate-500">Update your account password securely.</p>
+            <p className="text-xs text-slate-500 font-normal">Update your account password securely.</p>
           </div>
         </div>
 
@@ -583,7 +583,7 @@ export default function ManageProfile() {
               required
               value={passwords.newPassword}
               onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-              className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
+              className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none font-normal text-slate-900 bg-slate-50/50 font-mono"
               placeholder="••••••••"
             />
           </div>
@@ -597,7 +597,7 @@ export default function ManageProfile() {
               required
               value={passwords.confirmPassword}
               onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-              className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
+              className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none font-normal text-slate-900 bg-slate-50/50 font-mono"
               placeholder="••••••••"
             />
           </div>

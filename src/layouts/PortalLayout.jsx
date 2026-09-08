@@ -30,82 +30,133 @@ export default function PortalLayout({ management=false }) {
   const current = links.find(([path]) => path === location.pathname)?.[1] || 'Your account'
   
   return (
-    <div className="app-shell portal-shell">
-      <a className="skip-link" href="#main-content">Skip to content</a>
+    <div className="min-h-screen flex bg-slate-50 text-slate-900 selection:bg-[#67c4c7]/30">
+      <a className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-slate-900" href="#main-content">Skip to content</a>
       
-      <aside className={`portal-sidebar ${open ? 'sidebar-open' : ''}`}>
-        <div className="sidebar-brand">
+      {/* Sidebar Navigation */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-white/95 backdrop-blur-xl border-r border-slate-200/80 shadow-2xl lg:shadow-none flex flex-col transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className="p-6 flex items-center justify-between border-b border-slate-100">
           <Brand stacked />
-          <button className="icon-button sidebar-close" aria-label="Close navigation" onClick={() => setMenuAt(null)}>
-            <X />
+          <button 
+            className="lg:hidden p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors" 
+            aria-label="Close navigation" 
+            onClick={() => setMenuAt(null)}
+          >
+            <X size={20} />
           </button>
         </div>
         
-        <span className="sidebar-label" style={{ fontSize: '12px', letterSpacing: '0.05em' }}>
-          {management ? 'CLINIC WORKSPACE' : 'YOUR SMILE SPACE'}
-        </span>
+        <div className="px-6 pt-6 pb-2">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+            {management ? 'CLINIC WORKSPACE' : 'YOUR SMILE SPACE'}
+          </span>
+        </div>
         
-        <nav aria-label={management ? 'Management navigation' : 'Patient navigation'}>
+        <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto py-2" aria-label={management ? 'Management navigation' : 'Patient navigation'}>
           {links.map(([path, label, Icon]) => (
             <NavLink 
               key={path} 
               to={path} 
               end={path === base} 
               onClick={() => setMenuAt(null)}
-              style={{ fontSize: '13px', fontWeight: '500', gap: '12px' }}
+              className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all group relative ${
+                isActive 
+                  ? 'bg-[#67c4c7]/15 text-[#67c4c7] shadow-2xs font-bold' 
+                  : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
+              }`}
             >
-              <Icon size={20} strokeWidth={1.8}/>
-              <span>{label}</span>
-              <span className="nav-active-dot"/>
+              {({ isActive }) => (
+                <>
+                  <Icon size={20} strokeWidth={isActive ? 2.2 : 1.8} className={isActive ? 'text-[#67c4c7]' : 'text-slate-400 group-hover:text-slate-600'} />
+                  <span className="flex-1">{label}</span>
+                  {isActive && <span className="w-1.5 h-5 rounded-full bg-[#67c4c7] absolute right-3" />}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
         
-        <div className="sidebar-care">
-          <Heart size={22} strokeWidth={1.5}/>
-          <strong style={{ fontSize: '14px', lineHeight: '1.4' }}>A little care.<br/>A brighter you.</strong>
-          <Link to="/contact" style={{ fontSize: '13px', fontWeight: '600' }}>Need a hand? <ArrowUpRight size={15}/></Link>
+        <div className="p-4 mx-4 my-2 rounded-2xl bg-linear-to-br from-[#67c4c7]/10 to-sky-50 border border-[#67c4c7]/20 space-y-2">
+          <div className="flex items-center gap-2 text-[#67c4c7]">
+            <Heart size={20} strokeWidth={2}/>
+          </div>
+          <p className="text-xs font-bold text-slate-800 leading-snug">A little care.<br/>A brighter you.</p>
+          <Link to="/contact" className="inline-flex items-center gap-1 text-xs font-bold text-[#67c4c7] hover:underline">
+            Need a hand? <ArrowUpRight size={14}/>
+          </Link>
         </div>
         
-        <Link className="sidebar-website" to="/" style={{ fontSize: '14px', fontWeight: '500' }}>
-          Visit our website <ArrowUpRight size={16}/>
-        </Link>
-        <button className="sidebar-logout" onClick={signOut} style={{ fontSize: '14px', fontWeight: '500' }}>
-          <LogOut size={18}/> Sign out
-        </button>
+        <div className="p-4 border-t border-slate-100 space-y-1">
+          <Link 
+            className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors" 
+            to="/"
+          >
+            <span>Visit website</span> 
+            <ArrowUpRight size={15} className="text-slate-400"/>
+          </Link>
+          <button 
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors" 
+            onClick={signOut}
+          >
+            <LogOut size={16}/> 
+            <span>Sign out</span>
+          </button>
+        </div>
       </aside>
       
-      {open && <button className="sidebar-backdrop" aria-label="Close navigation" onClick={() => setMenuAt(null)}/>}
+      {open && <button className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden" aria-label="Close navigation" onClick={() => setMenuAt(null)}/>}
       
-      <div className="portal-workspace">
-        <header className="portal-header">
-          <div className="flex items-center gap-3 min-w-0">
-            <button className="icon-button portal-menu" aria-label="Open navigation" aria-expanded={open} onClick={() => setMenuAt(open ? null : location.pathname)}>
-              <Menu />
+      {/* Main Workspace Area */}
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-72">
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-2xs h-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <button 
+              className="lg:hidden p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors" 
+              aria-label="Open navigation" 
+              aria-expanded={open} 
+              onClick={() => setMenuAt(open ? null : location.pathname)}
+            >
+              <Menu size={20} />
             </button>
-            <div className="portal-breadcrumb">
-              <span>{management ? 'Clinic workspace' : 'My smile space'}</span><span>/</span><strong>{current}</strong>
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 truncate">
+              <span className="uppercase tracking-wider text-[11px] font-bold text-slate-400">{management ? 'Clinic workspace' : 'My smile space'}</span>
+              <span className="text-slate-300">/</span>
+              <strong className="text-slate-900 font-bold truncate">{current}</strong>
             </div>
           </div>
           
-          <div className="portal-user">
-            <Link to={base+'/notifications'} className="icon-button" aria-label="Appointment updates"><Bell size={19}/></Link>
-            <Link to={base+'/profile'} className="user-avatar" aria-label="My profile">
-              {profile?.avatar_url ? <img src={profile.avatar_url} alt=""/> : (profile?.full_name || user?.email || 'P').slice(0,1).toUpperCase()}
+          <div className="flex items-center gap-3">
+            <Link 
+              to={base+'/notifications'} 
+              className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors relative" 
+              aria-label="Appointment updates"
+            >
+              <Bell size={18}/>
             </Link>
-            <div className="portal-user-name">
-              <strong>{profile?.full_name || 'Welcome'}</strong>
-              <span>{management ? role : 'Patient account'}</span>
+            
+            <div className="flex items-center gap-3 pl-2 border-l border-slate-200">
+              <Link to={base+'/profile'} className="w-10 h-10 rounded-full bg-[#67c4c7] text-white font-bold flex items-center justify-center overflow-hidden shadow-inner shrink-0 border-2 border-white" aria-label="My profile">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  (profile?.full_name || user?.email || 'P').slice(0,1).toUpperCase()
+                )}
+              </Link>
+              <div className="hidden sm:block text-left leading-tight">
+                <strong className="block text-xs font-bold text-slate-900 truncate max-w-140px">{profile?.full_name || 'Welcome'}</strong>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{management ? role : 'Patient account'}</span>
+              </div>
             </div>
           </div>
         </header>
         
-        <main id="main-content" className="portal-content">
+        <main id="main-content" className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
         
-        <footer className="portal-footer">
-          Dentaprime - Dr. Karen Galagatan Dental Clinic <span>Your smile, in good hands.</span>
+        <footer className="px-8 py-6 border-t border-slate-200/80 bg-white text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>Dentaprime - Dr. Karen Galagatan Dental Clinic</span>
+          <span className="font-medium text-slate-600">Your smile, in good hands.</span>
         </footer>
       </div>
     </div>

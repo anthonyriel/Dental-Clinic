@@ -115,15 +115,15 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12 text-left">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-sky-600 uppercase">CLINIC WORKSPACE</span>
+          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">User Management</h1>
-          <p className="text-sm text-slate-600 mt-1">View registered accounts, edit profiles, assign roles, and manage users.</p>
+          <p className="text-sm text-slate-600 mt-1 font-normal">View registered accounts, edit profiles, assign roles, and manage users.</p>
         </div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-sky-50 text-sky-700 rounded-full text-xs font-semibold border border-sky-100 shadow-2xs self-start">
-          <ShieldCheck className="w-4 h-4 text-sky-600" /> Admin Access
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
+          <ShieldCheck className="w-4 h-4 text-[#67c4c7]" /> Admin Access
         </div>
       </div>
 
@@ -137,7 +137,7 @@ export default function UserManagement() {
             placeholder="Search name, username or phone" 
             value={search} 
             onChange={e => { setSearch(e.target.value); setPage(0) }} 
-            className="w-full pl-10 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition text-slate-900 bg-white shadow-sm" 
+            className="w-full pl-10 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none transition text-slate-900 bg-white shadow-sm" 
           />
         </div>
         
@@ -145,17 +145,17 @@ export default function UserManagement() {
           <button 
             disabled={pageIndex === 0} 
             onClick={() => setPage(pageIndex - 1)}
-            className="disabled:opacity-40 hover:text-sky-600 transition"
+            className="disabled:opacity-40 hover:text-[#67c4c7] transition font-bold"
           >
             Previous
           </button>
-          <span className="bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-xs shadow-2xs">
+          <span className="bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-xs shadow-2xs font-mono">
             {filtered.length} users · Page {pageIndex + 1}
           </span>
           <button 
             disabled={(pageIndex + 1) * 20 >= filtered.length} 
             onClick={() => setPage(pageIndex + 1)}
-            className="disabled:opacity-40 hover:text-sky-600 transition"
+            className="disabled:opacity-40 hover:text-[#67c4c7] transition font-bold"
           >
             Next
           </button>
@@ -163,39 +163,39 @@ export default function UserManagement() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-slate-500 text-sm">Loading users...</div>
+        <div className="text-center py-12 text-slate-500 text-sm font-normal">Loading users...</div>
       ) : (
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div className="divide-y divide-slate-100">
             {filtered.slice(pageIndex * 20, pageIndex * 20 + 20).map((u) => (
-              <div key={u.id} className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 hover:bg-slate-50/50 transition">
+              <div key={u.id} className="p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 hover:bg-slate-50/50 transition">
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <h4 className="font-bold text-slate-900 text-base">{u.full_name || 'Unnamed User'}</h4>
                     <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                      u.role === 'owner' ? 'bg-purple-50 text-purple-700 border border-purple-100' :
-                      u.role === 'admin' ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' :
-                      u.role === 'staff' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 
-                      'bg-slate-100 text-slate-600 border border-slate-200'
+                      u.role === 'owner' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+                      u.role === 'admin' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' :
+                      u.role === 'staff' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 
+                      'bg-slate-100 text-slate-700 border border-slate-200'
                     }`}>
                       {u.role}{u.is_active === false ? ' · Inactive' : ''}
                     </span>
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-500 font-medium">
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-500 font-normal">
                     <span className="flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-slate-400" /> @{u.username || 'N/A'}</span>
-                    <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" /> {u.phone || 'N/A'}</span>
+                    <span className="flex items-center gap-1.5 font-mono"><Phone className="w-3.5 h-3.5 text-slate-400" /> {u.phone || 'N/A'}</span>
                     <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-slate-400" /> {u.municipality || 'No City'}, {u.province || 'No Province'}</span>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1">
+                  <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">Role:</label>
                     <select
                       disabled={busy || !canManage(u)}
                       value={u.role}
                       onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                      className="text-xs sm:text-sm border-none bg-transparent focus:ring-0 outline-none font-normal text-slate-700 cursor-pointer disabled:cursor-not-allowed"
+                      className="text-xs sm:text-sm border-none bg-transparent focus:ring-0 outline-none font-bold text-slate-700 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <option value="client">Client</option>
                       <option value="staff">Staff</option>
@@ -207,7 +207,7 @@ export default function UserManagement() {
                   <button
                     disabled={busy || !canManage(u)}
                     onClick={() => openEditModal(u)}
-                    className="p-2.5 bg-white border border-slate-200 hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 text-slate-600 rounded-xl transition shadow-2xs disabled:opacity-50"
+                    className="p-2.5 bg-white border border-slate-200 hover:bg-[#67c4c7]/10 hover:text-[#67c4c7] hover:border-[#67c4c7]/30 text-slate-600 rounded-xl transition shadow-2xs disabled:opacity-50"
                     title="Edit User Profile"
                   >
                     <Edit className="w-4 h-4" />
@@ -216,7 +216,7 @@ export default function UserManagement() {
                   <button
                     disabled={busy || !canManage(u)}
                     onClick={() => handleToggleUser(u)}
-                    className="p-2.5 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 rounded-xl transition shadow-2xs disabled:opacity-50"
+                    className="px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 text-xs font-bold rounded-xl transition shadow-2xs disabled:opacity-50"
                     title="Change account access"
                   >
                     {u.is_active === false ? 'Reactivate' : 'Deactivate'}
@@ -231,10 +231,10 @@ export default function UserManagement() {
       {/* Edit User Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto overflow-x-hidden">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto overflow-x-hidden text-left">
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div>
-                <span className="text-[10px] font-bold tracking-wider text-sky-600 uppercase">PROFILE MANAGEMENT</span>
+                <span className="text-[10px] font-bold tracking-wider text-[#67c4c7] uppercase">PROFILE MANAGEMENT</span>
                 <h3 className="text-xl font-extrabold text-slate-900 mt-1">Edit User Profile</h3>
               </div>
               <button 
@@ -263,7 +263,7 @@ export default function UserManagement() {
                       required
                       value={formData.username}
                       onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                   <div>
@@ -273,7 +273,7 @@ export default function UserManagement() {
                       required
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                 </div>
@@ -286,7 +286,7 @@ export default function UserManagement() {
                       required
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                     />
                   </div>
                   <div>
@@ -296,7 +296,7 @@ export default function UserManagement() {
                       required
                       value={formData.birthdate}
                       onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                   <div>
@@ -304,7 +304,7 @@ export default function UserManagement() {
                     <select
                       value={formData.gender}
                       onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     >
                       <option value="Female">Female</option>
                       <option value="Male">Male</option>
@@ -320,7 +320,7 @@ export default function UserManagement() {
                     <select
                       value={formData.role}
                       onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     >
                       <option value="client">Client</option>
                       <option value="staff">Staff</option>
@@ -335,7 +335,7 @@ export default function UserManagement() {
                       required
                       value={formData.zipcode}
                       onChange={(e) => setFormData({ ...formData, zipcode: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition font-mono"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                     />
                   </div>
                 </div>
@@ -351,7 +351,7 @@ export default function UserManagement() {
                       type="text"
                       value={formData.region}
                       onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                   <div>
@@ -360,7 +360,7 @@ export default function UserManagement() {
                       type="text"
                       value={formData.province}
                       onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                   <div>
@@ -369,7 +369,7 @@ export default function UserManagement() {
                       type="text"
                       value={formData.municipality}
                       onChange={(e) => setFormData({ ...formData, municipality: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                 </div>
@@ -381,7 +381,7 @@ export default function UserManagement() {
                       type="text"
                       value={formData.barangay}
                       onChange={(e) => setFormData({ ...formData, barangay: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                   <div>
@@ -390,7 +390,7 @@ export default function UserManagement() {
                       type="text"
                       value={formData.streetName}
                       onChange={(e) => setFormData({ ...formData, streetName: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                   <div>
@@ -399,7 +399,7 @@ export default function UserManagement() {
                       type="text"
                       value={formData.subdivisionPurok}
                       onChange={(e) => setFormData({ ...formData, subdivisionPurok: e.target.value })}
-                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 text-slate-900 transition"
+                      className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     />
                   </div>
                 </div>
@@ -417,7 +417,7 @@ export default function UserManagement() {
                 <button
                   disabled={busy}
                   type="submit"
-                  className="flex-1 px-5 py-3 bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold rounded-xl transition shadow-md disabled:opacity-50"
+                  className="flex-1 px-5 py-3 bg-[#67c4c7] hover:bg-[#57b3b6] text-white text-sm font-bold rounded-xl transition shadow-md disabled:opacity-50"
                 >
                   {busy ? 'Saving...' : 'Save Changes'}
                 </button>

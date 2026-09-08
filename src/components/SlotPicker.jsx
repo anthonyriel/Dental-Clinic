@@ -4,33 +4,124 @@ import { useQuery } from '../hooks/useQuery'
 import { result } from '../lib/data'
 import { clinicDate } from '../lib/appointments'
 import Feedback from './Feedback'
-import { CalendarDays, Clock, RefreshCw } from 'lucide-react'
+import { CalendarDays, Clock, RefreshCw, AlertCircle } from 'lucide-react'
 import AvailabilityCalendar from './AvailabilityCalendar'
 import { visitDateLabel } from '../lib/presentation'
 
 export default function SlotPicker({ serviceId, excludeId = null, value, onChange, duration, calendarSettings }) {
   const [date, setDate] = useState(value?.appointment_date || '')
+  
   const loader = useCallback(async () => {
     if (!date || !serviceId) return []
     return result(supabase.rpc('available_slots', { p_date: date, p_service_id: String(serviceId), p_exclude_id: excludeId ? String(excludeId) : null }))
   }, [date, serviceId, excludeId])
+
   const { data: slots, error, loading, refresh } = useQuery(loader, [], 30000)
+  
   // Never retain a selection that a refresh reports as unavailable.
   const valid = !error && !loading && slots.some(slot => slot.time_slot === value?.time_slot && slot.appointment_date === date)
-  return <div className="slot-picker space-y-4">
-    {calendarSettings ? <AvailabilityCalendar serviceId={serviceId} settings={calendarSettings} date={date} onSelect={day => { setDate(day); onChange(null); refresh() }}/> : <label className="block text-sm font-semibold"><span className="flex items-center gap-2 mb-2"><CalendarDays size={17}/> Pick your date <span className="slot-timezone">Philippine time</span></span>
-      <input type="date" min={clinicDate()} required value={date} onChange={e => { setDate(e.target.value); onChange(null) }} className="block w-full border border-slate-300 rounded-lg p-3 mt-1" />
-    </label>}
-    {calendarSettings && date && <h3 className="calendar-selected-date">{visitDateLabel(date)} <span>Philippine time</span></h3>}
-    <Feedback error={error} onRetry={refresh} />
-    {!date && <div className="date-placeholder"><CalendarDays size={28} strokeWidth={1.3}/><p>A date that works for you.</p><span>Choose a day to explore available times.</span></div>}
-    {date && duration && <div className="slot-intro"><Clock size={16}/><span>{duration}-minute appointment · Full time ranges shown below</span></div>}
-    {date && !error && <div className="time-slot-grid">
-      {slots.filter(slot => slot.appointment_date === date).map(slot => <button key={slot.time_slot} type="button" aria-pressed={value?.time_slot === slot.time_slot && value?.appointment_date === date} onClick={() => onChange(slot)} className={`time-slot ${value?.time_slot === slot.time_slot && value?.appointment_date === date ? 'selected' : ''}`}>{slot.time_slot}</button>)}
-      {!slots.some(slot => slot.appointment_date === date) && <p className="slot-empty text-sm">{loading ? 'Loading availability...' : 'No available times. Choose another date or refresh.'}</p>}
-    </div>}
-    {value && !loading && !valid && <p role="alert" className="text-sm text-red-700">This time is no longer available. Select another time.</p>}
-    <input aria-label="Available appointment time" className="sr-only" tabIndex={-1} required value={valid ? value?.time_slot || '' : ''} onChange={() => {}} />
-    <button type="button" className="text-link" onClick={refresh}><RefreshCw size={14}/> Refresh availability</button>
-  </div>
+
+  return (
+    <div className="space-y-6 text-left">
+      {calendarSettings ? (
+        <AvailabilityCalendar 
+          serviceId={serviceId} 
+          settings={calendarSettings} 
+          date={date} 
+          onSelect={day => { setDate(day); onChange(null); refresh() }}
+        />
+      ) : (
+        <div className="space-y-1.5">
+          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">
+            Pick your date <span className="text-slate-400 font-normal lowercase">(Philippine time)</span>
+          </label>
+          <div className="relative">
+            <CalendarDays className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
+            <input 
+              type="date" 
+              min={clinicDate()} 
+              required 
+              value={date} 
+              onChange={e => { setDate(e.target.value); onChange(null) }} 
+              className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
+            />
+          </div>
+        </div>
+      )}
+
+      {calendarSettings && date && (
+        <div className="bg-[#67c4c7]/10 border border-[#67c4c7]/20 px-4 py-3 rounded-2xl flex items-center justify-between">
+          <span className="text-xs font-bold text-[#67c4c7] uppercase tracking-wider">Selected Date</span>
+          <span className="text-sm font-bold text-slate-900">{visitDateLabel(date)} <span className="text-xs text-slate-500 font-normal">(Philippine time)</span></span>
+        </div>
+      )}
+
+      <Feedback error={error} onRetry={refresh} />
+
+      {!date && (
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
+          <CalendarDays size={32} className="mx-auto text-slate-400" strokeWidth={1.5}/>
+          <p className="text-sm font-bold text-slate-900">A date that works for you.</p>
+          <p className="text-xs text-slate-500 font-normal">Choose a day to explore available times.</p>
+        </div>
+      )}
+
+      {date && duration && (
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-100 px-4 py-2.5 rounded-xl border border-slate-200">
+          <Clock size={15} className="text-[#67c4c7]" />
+          <span>{duration}-minute appointment · Full time ranges shown below</span>
+        </div>
+      )}
+
+      {date && !error && (
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {slots.filter(slot => slot.appointment_date === date).map(slot => {
+              const isSelected = value?.time_slot === slot.time_slot && value?.appointment_date === date
+              return (
+                <button 
+                  key={slot.time_slot} 
+                  type="button" 
+                  aria-pressed={isSelected} 
+                  onClick={() => onChange(slot)} 
+                  className={`py-3 px-4 rounded-xl text-xs font-bold transition-all border font-mono shadow-2xs ${
+                    isSelected 
+                      ? 'bg-[#67c4c7] text-white border-[#67c4c7] shadow-md ring-2 ring-[#67c4c7]/30' 
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  {slot.time_slot}
+                </button>
+              )
+            })}
+          </div>
+
+          {!slots.some(slot => slot.appointment_date === date) && (
+            <p className="text-sm text-slate-500 text-center py-6 font-normal bg-slate-50 rounded-2xl border border-slate-200">
+              {loading ? 'Loading availability...' : 'No available times. Choose another date or refresh.'}
+            </p>
+          )}
+        </div>
+      )}
+
+      {value && !loading && !valid && (
+        <div role="alert" className="flex items-center gap-2 text-xs font-medium text-red-700 bg-red-50 border border-red-200 p-3 rounded-xl">
+          <AlertCircle size={15} className="shrink-0 text-red-600" />
+          <span>This time is no longer available. Select another time.</span>
+        </div>
+      )}
+
+      <input aria-label="Available appointment time" className="sr-only" tabIndex={-1} required value={valid ? value?.time_slot || '' : ''} onChange={() => {}} />
+
+      <div className="pt-2">
+        <button 
+          type="button" 
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#67c4c7] hover:underline" 
+          onClick={refresh}
+        >
+          <RefreshCw size={14}/> Refresh availability
+        </button>
+      </div>
+    </div>
+  )
 }
