@@ -5,29 +5,29 @@ import AddressFields from '../../components/AddressFields'
 import { clinicDate } from '../../lib/appointments'
 import { 
   User, Phone, Calendar, MapPin, Lock, Camera, 
-  AlertCircle, CheckCircle2, AtSign, Mail, ZoomIn, Check, X, Sliders 
+  AlertCircle, CheckCircle2, AtSign, Mail, ZoomIn, Check, X, Sliders, ShieldCheck 
 } from 'lucide-react'
 
 export default function ManageProfile() {
   const { user, profile, refreshProfile } = useAuth()
   
   const [formData, setFormData] = useState(() => ({
-        username: profile.username || '',
-        fullName: profile.full_name || '',
-        email: user.email || '',
-        phone: profile.phone || '',
-        birthdate: profile.birthdate || '',
-        gender: profile.gender || 'Female',
-        regionName: profile.region || '',
-        provinceName: profile.province || '',
-        municipalityName: profile.municipality || '',
-        barangayName: profile.barangay || '',
-        houseNumber: profile.house_number || '',
-        streetName: profile.street_name || '',
-        subdivisionPurok: profile.subdivision_purok || '',
-        zipcode: profile.zipcode || '',
-        avatarUrl: profile.avatar_url || ''
-      }))
+    username: profile.username || '',
+    fullName: profile.full_name || '',
+    email: user.email || '',
+    phone: profile.phone || '',
+    birthdate: profile.birthdate || '',
+    gender: profile.gender || 'Female',
+    regionName: profile.region || '',
+    provinceName: profile.province || '',
+    municipalityName: profile.municipality || '',
+    barangayName: profile.barangay || '',
+    houseNumber: profile.house_number || '',
+    streetName: profile.street_name || '',
+    subdivisionPurok: profile.subdivision_purok || '',
+    zipcode: profile.zipcode || '',
+    avatarUrl: profile.avatar_url || ''
+  }))
 
   // Password change state
   const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' })
@@ -53,7 +53,10 @@ export default function ManageProfile() {
   const handleFileSelect = (e) => {
     const file = e.target.files[0]
     if (!file) return
-    if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) { setError('Choose a JPG, PNG or WebP image smaller than 5 MB.'); return }
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) { 
+      setError('Choose a JPG, PNG or WebP image smaller than 5 MB.')
+      return 
+    }
 
     const reader = new FileReader()
     reader.onload = () => {
@@ -65,7 +68,6 @@ export default function ManageProfile() {
     reader.readAsDataURL(file)
   }
 
-  // Allow re-adjusting current avatar anytime
   const handleReAdjustCurrentAvatar = () => {
     if (!formData.avatarUrl) return
     setRawImageSrc(formData.avatarUrl)
@@ -74,7 +76,6 @@ export default function ManageProfile() {
     setPanY(0)
   }
 
-  // Draw cropped image onto canvas matching preview precisely
   const handleSaveCroppedImage = async () => {
     if (!rawImageSrc) return
     setUploadingAvatar(true)
@@ -90,11 +91,11 @@ export default function ManageProfile() {
     img.onerror = () => { setUploadingAvatar(false); setError("Could not load this image. Choose another file.") }
     img.src = rawImageSrc
     img.onload = async () => {
-      ctx.fillStyle = '#0f172a' // match background color
+      ctx.fillStyle = '#0f172a'
       ctx.fillRect(0, 0, 400, 400)
 
       ctx.save()
-      const ratio = 400 / 192 // preview container is 192px wide (w-48)
+      const ratio = 400 / 192
       ctx.translate(200, 200)
       ctx.scale(zoom * ratio, zoom * ratio)
       ctx.translate(panX, panY)
@@ -199,36 +200,45 @@ export default function ManageProfile() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Manage Profile</h1>
-        <p className="text-sm text-slate-500 mt-1">Update your account details, address, profile picture, and password.</p>
+    <div className="max-w-3xl mx-auto space-y-8 pb-12">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
+        <div>
+          <span className="text-xs font-bold tracking-wider text-sky-600 uppercase">ACCOUNT SETTINGS</span>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Manage Profile</h1>
+          <p className="text-sm text-slate-600 mt-1">Update your professional profile credentials, residential address, and security settings.</p>
+        </div>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-sky-50 text-sky-700 rounded-full text-xs font-semibold border border-sky-100 shadow-2xs self-start">
+          <ShieldCheck className="w-4 h-4 text-sky-600" /> Secure Portal
+        </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{error}</span>
+        <div className="bg-red-50 text-red-700 p-4 rounded-2xl text-sm flex items-center gap-3 border border-red-200 shadow-2xs">
+          <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
+          <span className="font-medium">{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="bg-emerald-50 text-emerald-800 p-4 rounded-xl border border-emerald-200 text-sm flex items-center gap-2">
+        <div className="bg-emerald-50 text-emerald-800 p-4 rounded-2xl border border-emerald-200 text-sm flex items-center gap-3 shadow-2xs">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span>Profile updated successfully!</span>
+          <span className="font-semibold">Profile updated successfully!</span>
         </div>
       )}
 
-      {/* Image Cropper Modal */}
+      {/* Image Cropper Modal / Drawer */}
       {rawImageSrc && (
-        <div className="bg-slate-900 text-white p-6 rounded-2xl space-y-4 shadow-xl">
-          <h3 className="font-bold text-base flex items-center gap-2">
-            <Camera className="w-5 h-5 text-sky-400" /> Adjust & Crop Profile Picture
-          </h3>
-          <p className="text-xs text-slate-300">Use the zoom and pan controls to fit your photo inside the circle.</p>
+        <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl space-y-6 shadow-xl border border-slate-800">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <h3 className="font-bold text-lg flex items-center gap-2 text-white">
+              <Camera className="w-5 h-5 text-sky-400" /> Adjust & Crop Profile Picture
+            </h3>
+            <span className="text-xs text-slate-400">Position your image perfectly</span>
+          </div>
 
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-sky-500 bg-slate-950 flex items-center justify-center shadow-inner">
+          <div className="flex flex-col items-center justify-center space-y-6">
+            <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-sky-500/80 bg-slate-950 flex items-center justify-center shadow-2xl">
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <img 
                   src={rawImageSrc} 
@@ -244,10 +254,10 @@ export default function ManageProfile() {
               </div>
             </div>
 
-            <div className="w-full max-w-sm space-y-3 bg-slate-800 p-4 rounded-xl border border-slate-700">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-                <span className="flex items-center gap-1"><ZoomIn className="w-3.5 h-3.5" /> Zoom</span>
-                <span>{zoom.toFixed(2)}x</span>
+            <div className="w-full max-w-md space-y-4 bg-slate-800/60 p-5 rounded-2xl border border-slate-700/80 backdrop-blur-md">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-300">
+                <span className="flex items-center gap-1.5"><ZoomIn className="w-4 h-4 text-sky-400" /> Zoom Level</span>
+                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-sky-400">{zoom.toFixed(2)}x</span>
               </div>
               <input 
                 type="range" 
@@ -256,40 +266,40 @@ export default function ManageProfile() {
                 step="0.05" 
                 value={zoom} 
                 onChange={(e) => setZoom(parseFloat(e.target.value))} 
-                className="w-full accent-sky-500 cursor-pointer"
+                className="w-full accent-sky-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
               />
 
-              <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-700/60">
                 <div>
-                  <label className="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Pan Left / Right ({panX}px)</label>
+                  <label className="block text-[11px] text-slate-400 uppercase font-bold tracking-wider mb-1.5">Pan X ({panX}px)</label>
                   <input 
                     type="range" 
                     min="-150" 
                     max="150" 
                     value={panX} 
                     onChange={(e) => setPanX(parseInt(e.target.value))} 
-                    className="w-full accent-sky-500 cursor-pointer"
+                    className="w-full accent-sky-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Pan Up / Down ({panY}px)</label>
+                  <label className="block text-[11px] text-slate-400 uppercase font-bold tracking-wider mb-1.5">Pan Y ({panY}px)</label>
                   <input 
                     type="range" 
                     min="-150" 
                     max="150" 
                     value={panY} 
                     onChange={(e) => setPanY(parseInt(e.target.value))} 
-                    className="w-full accent-sky-500 cursor-pointer"
+                    className="w-full accent-sky-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 w-full max-w-sm pt-2">
+            <div className="flex items-center gap-4 w-full max-w-md pt-2">
               <button
                 type="button"
                 onClick={() => setRawImageSrc(null)}
-                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5"
+                className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2 border border-slate-700"
               >
                 <X className="w-4 h-4" /> Cancel
               </button>
@@ -297,40 +307,45 @@ export default function ManageProfile() {
                 type="button"
                 disabled={uploadingAvatar}
                 onClick={handleSaveCroppedImage}
-                className="flex-1 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-semibold text-xs transition shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50"
+                className="flex-1 py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-bold text-xs transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <Check className="w-4 h-4" /> {uploadingAvatar ? 'Saving...' : 'Crop & Save'}
+                <Check className="w-4 h-4" /> {uploadingAvatar ? 'Saving Avatar...' : 'Crop & Save Image'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Profile Details Form */}
-      <form onSubmit={handleUpdateProfile} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-        <div className="flex items-center gap-5 pb-4 border-b border-slate-100">
-          <div className="relative w-20 h-20 rounded-full bg-slate-100 overflow-hidden border-2 border-sky-500 shrink-0 flex items-center justify-center">
+      {/* Main Profile Details Form */}
+      <form onSubmit={handleUpdateProfile} className="bg-white p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-8">
+        
+        {/* Avatar Header Component */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-slate-100 text-center sm:text-left">
+          <div className="relative w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-4 border-sky-500 shadow-inner shrink-0 flex items-center justify-center">
             {formData.avatarUrl ? (
               <img src={formData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              <User className="w-10 h-10 text-slate-400" />
+              <User className="w-12 h-12 text-slate-400" />
             )}
           </div>
-          <div className="space-y-2">
-            <h4 className="font-bold text-slate-900 text-sm">Profile Picture</h4>
-            <div className="flex flex-wrap gap-2">
-              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-lg text-xs font-semibold cursor-pointer transition">
-                <Camera className="w-3.5 h-3.5" />
-                <span>Upload New</span>
+          <div className="space-y-3 flex-1">
+            <div>
+              <h3 className="font-bold text-slate-900 text-base">Profile Photograph</h3>
+              <p className="text-xs text-slate-500 mt-0.5">Upload a professional portrait or clear photo for your clinic profile.</p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl text-xs font-bold cursor-pointer transition border border-sky-200/60 shadow-2xs">
+                <Camera className="w-4 h-4" />
+                <span>Upload New Image</span>
                 <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
               </label>
               {formData.avatarUrl && (
                 <button
                   type="button"
                   onClick={handleReAdjustCurrentAvatar}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200 shadow-2xs"
                 >
-                  <Sliders className="w-3.5 h-3.5" />
+                  <Sliders className="w-4 h-4" />
                   <span>Adjust Photo</span>
                 </button>
               )}
@@ -338,127 +353,136 @@ export default function ManageProfile() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-              Username <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <AtSign className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                name="username"
-                required
-                value={formData.username}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-              />
+        {/* Personal Credentials */}
+        <div className="space-y-4">
+          <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Personal Information</h4>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                Username <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <AtSign className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  name="username"
+                  required
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition font-medium text-slate-900 bg-slate-50/50"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  name="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition font-medium text-slate-900 bg-slate-50/50"
+                />
+              </div>
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-              Full Name <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                name="fullName"
-                required
-                value={formData.fullName}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+                <input
+                  type="email"
+                  disabled
+                  value={formData.email}
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-slate-100/80 text-slate-500 cursor-not-allowed font-medium"
+                />
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address (Read-only)</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
-              <input
-                type="email"
-                disabled
-                value={formData.email}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-              Phone Number <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                name="phone"
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  name="phone"
                   pattern="(09[0-9]{9}|[+]639[0-9]{9})"
                   title="Enter 09 followed by 9 digits, or +639 followed by 9 digits."
-                required
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-              />
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition font-medium text-slate-900 bg-slate-50/50"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-              Birthdate <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
-              <input
-                type="date"
-                name="birthdate"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                Birthdate <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Calendar className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+                <input
+                  type="date"
+                  name="birthdate"
                   max={clinicDate()}
-                required
-                value={formData.birthdate}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none bg-white"
-              />
+                  required
+                  value={formData.birthdate}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 font-medium text-slate-900"
+                />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-              Gender <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none bg-white"
-            >
-              <option value="Female">Female</option>
-              <option value="Male">Male</option>
-              <option value="Non-binary">Non-binary</option>
-              <option value="Prefer not to say">Prefer not to say</option>
-            </select>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                Gender <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none bg-slate-50/50 font-medium text-slate-900"
+              >
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Non-binary">Non-binary</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Address Section */}
-        <div className="border-t border-slate-200 pt-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+        <div className="border-t border-slate-200/80 pt-6 space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-sky-600" /> Philippine Address Directory
-            </h3>
-            <span className="text-xs text-slate-500">Saved: {formData.regionName} / {formData.provinceName} / {formData.municipalityName}</span>
+            </h4>
+            <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">
+              Saved Region: {formData.regionName || 'None selected'}
+            </span>
           </div>
 
-          <AddressFields value={formData} onChange={changes => setFormData(prev => ({ ...prev, ...changes }))} />
+          <div className="bg-slate-50/60 p-5 rounded-2xl border border-slate-200/60 space-y-4">
+            <AddressFields value={formData} onChange={changes => setFormData(prev => ({ ...prev, ...changes }))} />
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 House / Bldg No.
               </label>
               <input
@@ -466,12 +490,12 @@ export default function ManageProfile() {
                 name="houseNumber"
                 value={formData.houseNumber}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Street Name
               </label>
               <input
@@ -479,36 +503,36 @@ export default function ManageProfile() {
                 name="streetName"
                 value={formData.streetName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
-                Subdivision or Purok
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                Subdivision / Purok
               </label>
               <input
                 type="text"
                 name="subdivisionPurok"
                 value={formData.subdivisionPurok}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
                 Zipcode <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="zipcode"
-                  pattern="[0-9]{4}"
-                  title="Enter a four-digit Philippine postal code."
+                pattern="[0-9]{4}"
+                title="Enter a four-digit Philippine postal code."
                 required
                 value={formData.zipcode}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none font-mono"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-mono font-bold text-slate-900 bg-slate-50/50"
               />
             </div>
           </div>
@@ -517,35 +541,41 @@ export default function ManageProfile() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-sky-600 text-white font-medium rounded-xl hover:bg-sky-700 transition shadow-sm disabled:opacity-50 text-sm mt-4"
+          className="w-full py-3.5 bg-sky-600 text-white font-bold rounded-xl hover:bg-sky-500 transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm mt-6"
         >
-          {loading ? 'Saving Changes...' : 'Save Profile Changes'}
+          {loading ? 'Saving Profile Changes...' : 'Save Profile Changes'}
         </button>
       </form>
 
       {/* Change Password Form */}
-      <form onSubmit={handlePasswordChange} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Lock className="w-5 h-5 text-sky-600" /> Change Password
-        </h3>
+      <form onSubmit={handlePasswordChange} className="bg-white p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+          <div className="p-2.5 rounded-xl bg-slate-900 text-white">
+            <Lock className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">Security Credentials</h3>
+            <p className="text-xs text-slate-500">Update your account password securely.</p>
+          </div>
+        </div>
 
         {passError && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 shrink-0" />
-            <span>{passError}</span>
+          <div className="bg-red-50 text-red-700 p-4 rounded-2xl text-sm flex items-center gap-3 border border-red-200">
+            <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
+            <span className="font-medium">{passError}</span>
           </div>
         )}
 
         {passSuccess && (
-          <div className="bg-emerald-50 text-emerald-800 p-3 rounded-lg text-sm flex items-center gap-2">
+          <div className="bg-emerald-50 text-emerald-800 p-4 rounded-2xl text-sm flex items-center gap-3 border border-emerald-200">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-            <span>Password updated successfully!</span>
+            <span className="font-semibold">Password updated successfully!</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
               New Password <span className="text-red-500">*</span>
             </label>
             <input
@@ -553,13 +583,13 @@ export default function ManageProfile() {
               required
               value={passwords.newPassword}
               onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+              className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
               placeholder="••••••••"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
               Confirm New Password <span className="text-red-500">*</span>
             </label>
             <input
@@ -567,7 +597,7 @@ export default function ManageProfile() {
               required
               value={passwords.confirmPassword}
               onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
+              className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none font-medium text-slate-900 bg-slate-50/50"
               placeholder="••••••••"
             />
           </div>
@@ -576,7 +606,7 @@ export default function ManageProfile() {
         <button
           type="submit"
           disabled={passLoading}
-          className="w-full py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition shadow-sm disabled:opacity-50 text-sm"
+          className="w-full py-3.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm"
         >
           {passLoading ? 'Updating Password...' : 'Update Password'}
         </button>

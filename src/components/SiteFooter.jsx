@@ -10,6 +10,6 @@ export default function SiteFooter() {
       <div><h2>Come say hello</h2><p className="footer-contact"><MapPin size={16} /> Tabajan, Guindulman, Bohol<br />Guindulman Guest House</p><a href="tel:09703857431"><Phone size={15} /> 0970 385 7431</a><a href="mailto:dentaprime.ksgdentalclinic@gmail.com"><Mail size={15} /> Email our team</a><a href="https://www.facebook.com/profile.php?id=100071177175813" target="_blank" rel="noopener noreferrer">Follow on Facebook <ArrowUpRight size={14} /></a></div>
       <div className="footer-hours"><h2>Clinic hours</h2><ClinicHours /></div>
     </div>
-    <div className="footer-bottom"><p>© {new Date().getFullYear()} Dentaprime Dental Clinic.</p><span>Thoughtful care. Brighter everyday smiles.</span></div>
+    <div className="footer-bottom"><p>© {new Date().getFullYear()} Dentaprime - Dr. Karen Galagatan Dental Clinic.</p><span>Thoughtful care. Brighter everyday smiles.</span></div>
   </div></footer>
 }
