@@ -106,7 +106,13 @@ export default function ManagementHome() {
                 <div className="space-y-1">
                   <h3 className="font-bold text-base text-slate-900">{patientName(a)}{a.walk_in_name ? ' · Walk-in' : ''}</h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    {serviceName(a)} · <span className="text-slate-700 font-bold">{a.time_slot}</span>
+                    {serviceName(a)} · <span className="text-slate-700 font-bold">
+                      {normalizeStatus(a.status) === 'completed'
+                        ? a.completed_at
+                          ? `Completed at ${new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Manila' }).format(new Date(a.completed_at))}`
+                          : 'Completion time not recorded'
+                        : a.time_slot}
+                    </span>
                   </p>
                 </div>
                 <span className={'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider status-' + normalizeStatus(a.status)}>

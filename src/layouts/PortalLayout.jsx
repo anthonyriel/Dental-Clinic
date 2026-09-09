@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CalendarDays, History, UserRound, Bell, Stethoscope, Users, SlidersHorizontal, ArrowUpRight, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, History, UserRound, Bell, Stethoscope, Users, SlidersHorizontal, ArrowUpRight, LogOut, Menu, X, BarChart3 } from 'lucide-react'
 import Brand from '../components/Brand'
 import { useAuth } from '../context/auth'
 
@@ -18,6 +18,7 @@ export default function PortalLayout({ management=false }) {
         [base+'/schedule', 'Appointments', CalendarDays],
         [base+'/walk-ins', 'Register walk-in', UserRound],
         [base+'/services', 'Services', Stethoscope],
+        [base+'/reports', 'Reports', BarChart3],
         [base+'/settings', 'Availability', SlidersHorizontal],
         ...(['admin','owner'].includes(role) ? [[base+'/users', 'People & access', Users]] : [])
       ] 

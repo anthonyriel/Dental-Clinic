@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../services/supabaseClient'
 import { useQuery } from '../hooks/useQuery'
 import { result } from '../lib/data'
@@ -17,10 +17,16 @@ export default function SlotPicker({ serviceId, serviceIds, excludeId = null, va
     return result(supabase.rpc(walkIn ? 'available_walk_in_slots' : 'available_service_slots', { p_date: date, ...(walkIn ? { p_service_id: String(serviceId) } : { p_service_ids: JSON.parse(servicesKey) }), p_exclude_id: excludeId ? String(excludeId) : null }))
   }, [date, serviceId, servicesKey, excludeId, walkIn])
 
-  const { data: slots, error, loading, refresh } = useQuery(loader, [], 30000)
+  const { data: slots, error, loading, refresh } = useQuery(loader, [], date ? 10000 : 0)
   
-  const filteredSlots = (slots || []).filter(slot => slot.appointment_date === date)
-  const valid = !error && !loading && filteredSlots.some(slot => slot.time_slot === value?.time_slot && slot.appointment_date === date)
+  // The availability RPC excludes every reservation overlapping the full visit.
+  // Never render retained results from a failed request as available times.
+  const filteredSlots = error || loading ? [] : (slots || []).filter(slot => slot.appointment_date === date)
+  const valid = value?.appointment_date === date && filteredSlots.some(slot => slot.time_slot === value?.time_slot)
+
+  useEffect(() => {
+    if (value && !loading && !error && !valid) onChange(null)
+  }, [value, loading, error, valid, onChange])
 
   return (
     <div className="space-y-6 text-left">
@@ -78,6 +84,7 @@ export default function SlotPicker({ serviceId, serviceIds, excludeId = null, va
 
       {date && !error && (
         <div className="space-y-3">
+          <p className="text-xs text-slate-500">Only available times are shown. Booked and overlapping times are hidden. Updates every 10 seconds.</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {filteredSlots.map(slot => {
               const displayRange = slot.time_slot

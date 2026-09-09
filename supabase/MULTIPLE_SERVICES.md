@@ -14,9 +14,17 @@ Availability checks the total duration against other reservations, configured ho
 
 Existing single-service appointments are copied into the service table using their stored snapshots. Single-service walk-ins continue working and receive a service record too. Historical rows already containing several `service_ids` are left intact without guessing each service's old price or duration; those rows need manual review before service-level historical reports. This migration does not reconstruct data that was never recorded.
 
-For future reports, join `appointment_services.appointment_id` to `appointments.id`. Count visits from `appointments`, and treatments from `appointment_services`. Filter completed visits when reporting completed treatments. Line prices are **quotes**, not proof of payment. The existing management screen records a total for the visit; this change does not allocate that actual total among services. Service-level payments or independently completing individual treatments will need a separate feature.
+For future reports, join `appointment_services.appointment_id` to `appointments.id`. Count visits from `appointments`, and treatments from `appointment_services`. Filter completed visits when reporting completed treatments. `quoted_price` is a quote, not a payment.
 
-Completion now saves the final visit price through `complete_appointment`, which checks management access, status and version and records the completion event and timestamp. Confirmed visits can be completed only after their scheduled start, matching the existing database rule.
+Run `migrations/202609100003_service_payments.sql` after the early-completion migration, then deploy the updated frontend. Completion requires one explicit paid amount per service (including 0 for no charge), stored in `appointment_services.paid_amount`. Supabase calculates `appointments.price` from those amounts and saves the amounts, completed status, timestamp and event together. Each amount supports up to two decimal places. Quoted prices remain unchanged, and future appointments can still be completed early.
+
+Previously completed visits keep their total but have NULL service-level amounts, displayed as “Paid amount not recorded.” Do not treat NULL as zero or allocate the old total using quoted prices. For service revenue, sum recorded `paid_amount` values and separately identify historical visits whose breakdown is missing. This feature records amounts paid at completion; it is not an installment, refund or partial-treatment workflow.
+
+For older completed single-service visits, run `migrations/202609100004_legacy_single_service_payments.sql`. It copies the existing actual visit total into an empty service payment only when exactly one service record matches the appointment's service ID and there is no multi-service selection. Existing service payments, quotes, non-completed appointments and ambiguous multi-service totals are left unchanged. The query returns the service payments it filled and is safe to rerun.
+
+Completion saves the final visit price through `complete_appointment`, which checks management access, status and version and records the completion event and timestamp.
+
+For early treatment, run `migrations/202609100002_early_completion.sql` after the multi-service migration. Staff can then complete pending or confirmed visits before the scheduled date once all services have actually been delivered. The original scheduled date and service quotes remain unchanged; `completed_at` records when staff marked treatment complete. The original future slot is released in both online and walk-in availability. This records a completed treatment, not a new reservation for today's chair time; staff must coordinate actual treatment availability. Cancellation requests must be resolved before completion, and future visits still cannot be marked no-show.
 
 ## Manual verification after applying
 

@@ -19,6 +19,7 @@ import AppointmentHistory from './pages/patient/AppointmentHistory'
 import ManageProfile from './pages/patient/ManageProfile'
 
 import ManagementHome from './pages/management/ManagementHome'
+import Reports from './pages/management/Reports'
 import ScheduleManagement from './pages/management/ScheduleManagement'
 import ServicesManagement from './pages/management/ServicesManagement'
 import UserManagement from './pages/management/UserManagement'
@@ -77,6 +78,7 @@ export default function App() {
           >
             <Route index element={<ManagementHome />} />
             <Route path="schedule" element={<ScheduleManagement />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="walk-ins" element={<WalkIn />} />
             <Route path="services" element={<ServicesManagement />} />
             <Route path="settings" element={<ClinicSettings />} />

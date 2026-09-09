@@ -15,9 +15,13 @@ test('upcoming includes pending cancellations but excludes elapsed and terminal 
   assert(!isUpcoming(appt,new Date('2026-09-16T00:00:00Z')))
   assert(!isUpcoming({...appt,status:'completed'},new Date('2026-09-08T00:00:00Z')))
 })
-test('completed visits cannot be cancelled and future visits cannot be completed',()=>{
+test('staff can complete future visits but cannot mark them no-show or change terminal visits',()=>{
   assert.deepEqual(allowedActions({...appt,status:'completed'}),[])
-  assert(!allowedActions(appt,new Date('2026-09-08T00:00:00Z')).includes('completed'))
+  const now = new Date('2026-09-08T00:00:00Z')
+  assert(allowedActions(appt,now).includes('completed'))
+  assert(allowedActions({...appt,status:'pending'},now).includes('completed'))
+  assert(!allowedActions(appt,now).includes('no_show'))
+  assert(!allowedActions({...appt,status:'cancelled'},now).includes('completed'))
 })
 test('same-day appointments sort by actual time, including noon',()=>{
   const times=['01:30 PM - 02:30 PM','11:00 AM - 12:00 PM','09:00 AM - 10:00 AM']

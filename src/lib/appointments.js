@@ -33,8 +33,8 @@ export function sortAppointments(items) {
 export function allowedActions(appointment, now = new Date()) {
   const status = normalizeStatus(appointment.status)
   if (status === 'cancellation_requested') return ['approve_cancellation', 'reject_cancellation']
-  if (status === 'pending') return appointmentStart(appointment) > now ? ['confirmed', 'cancelled', 'reschedule'] : ['cancelled', 'reschedule']
-  if (status === 'confirmed') return appointmentStart(appointment) > now ? ['cancelled', 'reschedule'] : ['completed', 'no_show', 'cancelled', 'reschedule']
+  if (status === 'pending') return appointmentStart(appointment) > now ? ['confirmed', 'completed', 'cancelled', 'reschedule'] : ['completed', 'cancelled', 'reschedule']
+  if (status === 'confirmed') return appointmentStart(appointment) > now ? ['completed', 'cancelled', 'reschedule'] : ['completed', 'no_show', 'cancelled', 'reschedule']
   return []
 }
 

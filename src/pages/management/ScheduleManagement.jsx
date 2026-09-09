@@ -3,7 +3,9 @@ import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../services/supabaseClient'
 import { useQuery } from '../../hooks/useQuery'
 import { loadManagementAppointments } from '../../lib/queries'
-import { allowedActions, statusLabel } from '../../lib/appointments'
+import { allowedActions, appointmentServices, statusLabel } from '../../lib/appointments'
+import { paymentTotal } from '../../lib/payments'
+import { priceLabel } from '../../lib/presentation'
 import { result, errorMessage } from '../../lib/data'
 import Feedback from '../../components/Feedback'
 import AppointmentList from '../../components/AppointmentList'
@@ -19,7 +21,9 @@ export default function ScheduleManagement() {
   const [selected, setSelected] = useState(null)
   const [reason, setReason] = useState('')
   const [slot, setSlot] = useState(null)
-  const [actualPrice, setActualPrice] = useState('')
+  const [paidAmounts, setPaidAmounts] = useState({})
+  const serviceLines = appointmentServices(selected?.appointment || {})
+  const totalPaid = paymentTotal(serviceLines, paidAmounts)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -29,8 +33,8 @@ export default function ScheduleManagement() {
     if (busy || !selected) return
     
     if (selected.action !== 'delete' && !reason.trim()) return
-    if (selected.action === 'completed' && (actualPrice === '' || isNaN(Number(actualPrice)))) {
-      setError('Please enter a valid actual price paid.')
+    if (selected.action === 'completed' && totalPaid === null) {
+      setError('Enter the amount paid for every service, using up to two decimal places. Enter 0 for a service with no charge.')
       return
     }
 
@@ -40,11 +44,11 @@ export default function ScheduleManagement() {
         await result(supabase.from('appointments').delete().eq('id', selected.appointment.id))
         setMessage('Appointment permanently deleted.')
       } else if (selected.action === 'completed') {
-        await result(supabase.rpc('complete_appointment', {
+        await result(supabase.rpc('complete_appointment_services', {
           p_id: String(selected.appointment.id),
           p_version: selected.appointment.version,
           p_reason: reason.trim(),
-          p_price: Number(actualPrice),
+          p_payments: serviceLines.map(service => ({ appointment_service_id: service.id, paid_amount: paidAmounts[service.id] })),
         }))
         setMessage('Appointment marked as completed successfully.')
       } else {
@@ -93,7 +97,7 @@ export default function ScheduleManagement() {
             appointments={schedule.data} 
             initialDate={initialDate}
             initialStatus={initialStatus}
-            onDelete={a => { setSelected({ appointment: a, action: 'delete' }); setSlot(null); setReason(''); setActualPrice(''); setError('') }}
+            onDelete={a => { setSelected({ appointment: a, action: 'delete' }); setSlot(null); setReason(''); setPaidAmounts({}); setError('') }}
             renderActions={a => {
               const actions = allowedActions(a);
 
@@ -109,7 +113,7 @@ export default function ScheduleManagement() {
                         action === 'cancel' || action === 'reject' ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' :
                         'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`} 
-                      onClick={() => { setSelected({ appointment: a, action }); setSlot(null); setReason(''); setActualPrice(a.price ?? ''); setError('') }}
+                      onClick={() => { setSelected({ appointment: a, action }); setSlot(null); setReason(''); setPaidAmounts({}); setError('') }}
                     >
                       {statusLabel(action === 'completed' ? 'complete' : action)}
                     </button>
@@ -177,19 +181,29 @@ export default function ScheduleManagement() {
                 )}
 
                 {selected.action === 'completed' && (
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide space-y-1.5">
-                    Actual Price Paid (₱) <span className="text-red-500">*</span>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      min="0"
-                      required 
-                      value={actualPrice} 
-                      onChange={e => setActualPrice(e.target.value)} 
-                      placeholder="Enter final price paid..."
-                      className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 transition font-mono" 
-                    />
-                  </label>
+                  <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+                    Complete only after all services have been provided. Completion is recorded now; the original booking date stays in the history. If treatment was early, the future time becomes available again.
+                  </p>
+                )}
+
+                {selected.action === 'completed' && (
+                  <fieldset disabled={busy} className="space-y-4 min-w-0">
+                    <legend className="text-sm font-bold text-slate-900 mb-3">Amount paid per service</legend>
+                    {!serviceLines.length && <p role="alert" className="text-sm text-red-700">Service records are missing. Review this appointment before recording payment.</p>}
+                    {serviceLines.map(service => (
+                      <label key={service.id} className="block space-y-1.5 text-sm font-semibold text-slate-700">
+                        <span className="block break-words">{service.service_name} — Paid (₱)</span>
+                        <span className="block text-xs font-normal text-slate-500">Quote: {priceLabel(service.quoted_price)}</span>
+                        <input type="text" inputMode="decimal" required pattern="[0-9]{1,10}(\.[0-9]{1,2})?"
+                          disabled={busy} value={paidAmounts[service.id] ?? ''}
+                          onChange={e => setPaidAmounts(current => ({ ...current, [service.id]: e.target.value }))}
+                          placeholder="0.00" className="block min-h-11 border border-slate-300 rounded-xl p-3 w-full font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 font-mono" />
+                      </label>
+                    ))}
+                    <p className="flex flex-wrap justify-between gap-2 border-t border-slate-200 pt-3 font-bold text-slate-900">
+                      <span>Total paid</span><output aria-live="polite">{totalPaid === null ? 'Enter all amounts' : priceLabel(totalPaid)}</output>
+                    </p>
+                  </fieldset>
                 )}
 
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide space-y-1.5">
