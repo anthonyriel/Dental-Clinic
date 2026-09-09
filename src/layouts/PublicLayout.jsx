@@ -56,7 +56,7 @@ export default function PublicLayout() {
             </Link>
             
             <button 
-              className="md:hidden p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors" 
+              className="md:hidden inline-flex items-center justify-center shrink-0 p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors" 
               aria-expanded={isOpen} 
               aria-controls="mobile-navigation" 
               aria-label={isOpen ? 'Close navigation' : 'Open navigation'} 

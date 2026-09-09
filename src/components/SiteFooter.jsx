@@ -11,13 +11,10 @@ export default function SiteFooter() {
           
           {/* Column 1: Brand & Bio */}
           <div className="space-y-4">
-            <Brand />
-            <p className="text-sm text-slate-400 font-normal leading-relaxed">
-              A little care goes a long way.<br />Make time for your smile.
-            </p>
-            <span className="text-[10px] font-extrabold tracking-widest text-[#67c4c7] uppercase block pt-2 font-mono">
-              DR. KAREN GALAGATAN
-            </span>
+            {/* Using Tailwind arbitrary variants to override the dark text colors from Brand.jsx */}
+            <div className="inline-block [&_.text-slate-900]:text-white! [&_.text-slate-500]:text-slate-400!">
+              <Brand />
+            </div>
           </div>
 
           {/* Column 2: Quick Links */}
