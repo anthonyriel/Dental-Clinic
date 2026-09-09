@@ -4,7 +4,7 @@ import { useQuery } from '../../hooks/useQuery'
 import { loadServices } from '../../lib/queries'
 import { result, updateOne, errorMessage } from '../../lib/data'
 import Feedback from '../../components/Feedback'
-import { Plus, Edit3, Archive, RotateCcw, Clock, Tag } from 'lucide-react'
+import { Edit3, Archive, RotateCcw, Clock, Tag } from 'lucide-react'
 
 const emptyForm = { name: '', description: '', price: '', duration_minutes: 60 }
 

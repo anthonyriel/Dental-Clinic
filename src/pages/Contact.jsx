@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, MapPin, Phone, Mail } from 'lucide-react'
-import Brand from '../components/Brand'
+
 import ClinicHours from '../components/ClinicHours'
 
 export default function Contact() {

@@ -1,20 +1,23 @@
 import { Link } from 'react-router-dom'
 import { CalendarDays, Clock, CircleHelp, ListChecks, ArrowUpRight, PlusCircle, CalendarOff } from 'lucide-react'
 import { useQuery } from '../../hooks/useQuery'
-import { loadManagementAppointments } from '../../lib/queries'
+import { supabase } from '../../services/supabaseClient'
+import { managementSummary } from '../../lib/managementSummary'
 import { clinicDate, serviceName, statusLabel, normalizeStatus } from '../../lib/appointments'
 import { visitDateLabel } from '../../lib/presentation'
 import Feedback from '../../components/Feedback'
 
+const loadSummary = () => managementSummary(supabase, clinicDate())
+
 export default function ManagementHome() {
-  const schedule = useQuery(loadManagementAppointments, [], 30000)
-  const today = schedule.data.filter(a => a.appointment_date === clinicDate() && !['cancelled', 'no_show'].includes(a.status))
+  const schedule = useQuery(loadSummary, null, 30000)
+  const today = schedule.data?.today || []
   
   const cards = [
-    ['Today’s appointments', today.length, CalendarDays, 'Your day at a glance'],
-    ['Pending bookings', schedule.data.filter(a => a.status === 'pending').length, Clock, 'Waiting for your confirmation'],
-    ['Cancellation requests', schedule.data.filter(a => a.status === 'cancellation_requested').length, CircleHelp, 'Patients needing a decision'],
-    ['All appointments', schedule.data.length, ListChecks, 'The complete clinic schedule']
+    ['Today’s appointments', schedule.data?.todayCount, CalendarDays, 'Your day at a glance'],
+    ['Pending bookings', schedule.data?.pendingCount, Clock, 'Waiting for your confirmation'],
+    ['Cancellation requests', schedule.data?.cancellationCount, CircleHelp, 'Patients needing a decision'],
+    ['All appointments', schedule.data?.totalCount, ListChecks, 'The complete clinic schedule']
   ]
 
   return (
@@ -24,7 +27,7 @@ export default function ManagementHome() {
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"/> Live sync active
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"/> Refreshes every 30 seconds
             </span>
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">A good day for great care.</h1>

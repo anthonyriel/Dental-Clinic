@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { ArrowUpRight, MapPin, Phone, Mail, ShieldCheck, Info } from 'lucide-react'
+
+import { ArrowUpRight, MapPin, Phone, Mail, Info } from 'lucide-react'
 import Brand from './Brand'
 import ClinicHours from './ClinicHours'
 

@@ -10,6 +10,7 @@ import { priceLabel, visitDateLabel } from '../../lib/presentation'
 import ServiceCard from '../../components/ServiceCard'
 import SlotPicker from '../../components/SlotPicker'
 import Feedback from '../../components/Feedback'
+import { formatMobile, normalizeMobile } from '../../lib/phone'
 
 const stepNames = ['Your care', 'Your time', 'Your details', 'Review']
 
@@ -39,22 +40,18 @@ export default function BookAppointment() {
   }
 
   function handlePhoneChange(e) {
-    const raw = e.target.value.replace(/\D/g, '')
-    let formatted = raw
-    if (raw.startsWith('09')) {
-      if (raw.length > 4 && raw.length <= 7) {
-        formatted = `${raw.slice(0, 4)} ${raw.slice(4)}`
-      } else if (raw.length > 7) {
-        formatted = `${raw.slice(0, 4)} ${raw.slice(4, 7)} ${raw.slice(7, 11)}`
-      }
-    }
-    setDetails({...details, phone: formatted})
+    setDetails({...details, phone: e.target.value})
   }
   
   async function submit(e) {
     e.preventDefault()
     setError('')
-    const cleanPhone = details.phone.replace(/\s+/g, '')
+    const cleanPhone = normalizeMobile(details.phone)
+    if (step >= 2 && (!details.full_name.trim() || !cleanPhone)) {
+      setError('Enter your name and a valid Philippine mobile number, such as 0912 345 6789 or +63 912 345 6789.')
+      setStep(2)
+      return
+    }
 
     if (step < 3) {
       if (!selected) { setStep(0); return }
@@ -225,9 +222,10 @@ export default function BookAppointment() {
                       placeholder="0912 345 6789" 
                       value={details.phone} 
                       onChange={handlePhoneChange}
+                      onBlur={() => setDetails(current => ({ ...current, phone: formatMobile(current.phone) }))}
                       className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                     />
-                    <span className="text-xs text-slate-400 block pt-1">Format: 09XX XXX XXXX (Philippine mobile number)</span>
+                    <span className="text-xs text-slate-500 block pt-1">Use 09XX XXX XXXX or +63 9XX XXX XXXX.</span>
                   </div>
 
                   <div className="space-y-1.5">

@@ -10,7 +10,7 @@ import SlotPicker from '../../components/SlotPicker'
 import { RefreshCw, X } from 'lucide-react'
 
 export default function ScheduleManagement() {
-  const schedule = useQuery(loadManagementAppointments, [], 30000)
+  const schedule = useQuery(loadManagementAppointments, [], 0, { refreshOnFocus: false })
   const [selected, setSelected] = useState(null)
   const [reason, setReason] = useState('')
   const [slot, setSlot] = useState(null)
@@ -39,7 +39,7 @@ export default function ScheduleManagement() {
         <div>
           <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Schedule Management</h1>
-          <p className="text-sm text-slate-600 mt-1 font-normal">Manage patient bookings, approve requests, and adjust clinic schedules.</p>
+          <p className="text-sm text-slate-600 mt-1 font-normal">Manage patient bookings, approve requests, and adjust clinic schedules. Refresh to see changes from other users. Your changes refresh this list automatically.</p>
         </div>
         <button 
           onClick={schedule.refresh} 

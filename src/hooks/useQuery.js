@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { errorMessage } from '../lib/data'
-export function useQuery(loader, initial = null, interval = 0) {
+export function useQuery(loader, initial = null, interval = 0, { refreshOnFocus = true } = {}) {
   const [state, setState] = useState({ data: initial, loading: true, error: '', loader: null })
   const [version, setVersion] = useState(0)
   const refresh = useCallback(() => setVersion(value => value + 1), [])
@@ -15,9 +15,9 @@ export function useQuery(loader, initial = null, interval = 0) {
       }
     }
     run()
-    const timer = interval ? setInterval(refresh, interval) : null
-    window.addEventListener('focus', refresh)
+    const timer = interval ? setInterval(() => { if (!document.hidden) refresh() }, interval) : null
+    if (refreshOnFocus) window.addEventListener('focus', refresh)
     return () => { cancelled = true; clearInterval(timer); window.removeEventListener('focus', refresh) }
-  }, [loader, version, interval, refresh])
+  }, [loader, version, interval, refresh, refreshOnFocus])
   return { ...state, data: state.loader === loader ? state.data : initial, loading: state.loader !== loader || state.loading, error: state.loader === loader ? state.error : '', refresh }
 }

@@ -31,7 +31,7 @@ export default function AvailabilityCalendar({ serviceId, settings, date, onSele
   const loader = useCallback(async () => {
     return loadMonthAvailability(month, today, settings, serviceId)
   }, [month, today, settings, serviceId])
-  const { data, loading, refresh } = useQuery(loader, {}, 60000)
+  const { data, loading, refresh } = useQuery(loader, {}, 0, { refreshOnFocus: false })
   const failed = Object.values(data).some(count => count === null)
   const title = new Intl.DateTimeFormat('en-PH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${month}-01T12:00:00Z`))
 
@@ -72,19 +72,14 @@ export default function AvailabilityCalendar({ serviceId, settings, date, onSele
           const count = data[day]
           const status = state !== 'check' ? state : count == null ? (loading ? 'loading' : 'unknown') : count > 0 ? 'available' : 'unavailable'
           
-          let dotColor = ''
-          if (status === 'available') {
-            dotColor = count > 3 ? 'bg-emerald-500' : 'bg-amber-500'
-          } else {
-            dotColor = 'bg-slate-300'
-          }
+          const dotColor = status === 'available' ? 'bg-emerald-500' : 'bg-slate-300'
 
-          const label = {past:'Past',later:'Not open',closed:'Closed',loading:'…',unknown:'Retry',available: count > 3 ? 'Open' : 'Limited',unavailable:'Full'}[status]
+          const label = {past:'Past',later:'Not open',closed:'Closed',loading:'…',unknown:'Retry',available:'Open',unavailable:'No times'}[status]
           const isSelected = date === day
 
           let btnStyles = "py-2 px-1 min-h-[64px] rounded-2xl flex flex-col items-center justify-between transition-all border font-mono shadow-2xs "
           if (isSelected) {
-            btnStyles += "bg-[#67c4c7] text-white border-[#67c4c7] shadow-md ring-2 ring-[#67c4c7]/30 font-bold"
+            btnStyles += "bg-[#67c4c7] text-slate-900 border-[#67c4c7] shadow-md ring-2 ring-[#67c4c7]/30 font-bold"
           } else if (status === 'available') {
             btnStyles += "bg-white hover:bg-[#67c4c7]/10 text-slate-900 border-slate-200 hover:border-[#67c4c7]/40 font-semibold cursor-pointer"
           } else {
@@ -110,20 +105,19 @@ export default function AvailabilityCalendar({ serviceId, settings, date, onSele
                 <span className="text-[9px] text-slate-400 my-1 font-sans">·</span>
               )}
 
-              <span className={`text-[8px] uppercase tracking-wider font-sans whitespace-nowrap ${isSelected ? 'text-white/90 font-bold' : 'text-slate-500'}`}>{label}</span>
+              <span className={`text-[8px] uppercase font-sans ${isSelected ? 'text-slate-900 font-bold' : 'text-slate-500'}`}>{label}</span>
             </button>
           )
         })}
       </div>
 
       <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-slate-100 text-xs font-medium text-slate-600">
-        <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"/>Wide open (&gt;3 slots)</span>
-        <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"/>Limited slots</span>
-        <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-300"/>Closed / Full</span>
+        <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"/>Available times</span>
+        <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-300"/>No times / closed</span>
       </div>
 
       <p className="text-xs text-slate-500 font-normal leading-relaxed">
-        Availability is for your selected service. Select a date to check its latest times.
+        Availability is for your selected service. No times can mean fully booked, a special closure, or no remaining times that fit. Start times can overlap and are not a count of separate appointments. Select a date to check its latest times, or refresh this calendar to update the month.
       </p>
 
       {loading && <p role="status" className="text-xs font-bold text-[#67c4c7] animate-pulse">Checking this month’s availability…</p>}

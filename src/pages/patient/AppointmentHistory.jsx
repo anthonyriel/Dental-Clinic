@@ -7,7 +7,7 @@ import { canRequestCancellation, normalizeStatus } from '../../lib/appointments'
 import { result, errorMessage } from '../../lib/data'
 import Feedback from '../../components/Feedback'
 import AppointmentList from '../../components/AppointmentList'
-import { History, CalendarDays, X, ShieldAlert, PhoneCall } from 'lucide-react'
+import { History, X, ShieldAlert, PhoneCall } from 'lucide-react'
 
 export default function AppointmentHistory() {
   const { user } = useAuth()

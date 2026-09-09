@@ -5,7 +5,7 @@ import { useQuery } from '../hooks/useQuery'
 import { result } from '../lib/data'
 import { statusLabel } from '../lib/appointments'
 import Feedback from '../components/Feedback'
-import { Bell, Clock, Info, CheckCircle2 } from 'lucide-react'
+import { Bell, Clock, Info } from 'lucide-react'
 
 export default function Notifications() {
   const { user, role } = useAuth()
