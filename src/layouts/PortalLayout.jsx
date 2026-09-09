@@ -16,6 +16,7 @@ export default function PortalLayout({ management=false }) {
     ? [
         [base, 'Overview', LayoutDashboard],
         [base+'/schedule', 'Appointments', CalendarDays],
+        [base+'/walk-ins', 'Register walk-in', UserRound],
         [base+'/services', 'Services', Stethoscope],
         [base+'/settings', 'Availability', SlidersHorizontal],
         ...(['admin','owner'].includes(role) ? [[base+'/users', 'People & access', Users]] : [])

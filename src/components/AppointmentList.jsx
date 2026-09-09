@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CalendarDays, Clock, Search, X } from 'lucide-react'
-import { serviceName, servicePrice, statusLabel, normalizeStatus } from '../lib/appointments'
+import { serviceName, servicePrice, statusLabel, normalizeStatus, patientName, patientPhone } from '../lib/appointments'
 import { priceLabel } from '../lib/presentation'
 
 export default function AppointmentList({ appointments, management = false, renderActions }) {
@@ -12,7 +12,7 @@ export default function AppointmentList({ appointments, management = false, rend
   const filtered = appointments.filter(a => 
     (!date || a.appointment_date === date) && 
     (!status || statusLabel(a.status) === status) && 
-    `${serviceName(a)} ${a.profiles?.full_name || ''} ${a.profiles?.phone || ''}`.toLowerCase().includes(search.toLowerCase())
+    `${serviceName(a)} ${patientName(a)} ${patientPhone(a)} ${a.walk_in_name ? 'walk-in' : ''}`.toLowerCase().includes(search.toLowerCase())
   )
 
   const currentPage = Math.min(page, Math.max(0, Math.ceil(filtered.length / 20) - 1))
@@ -93,7 +93,7 @@ export default function AppointmentList({ appointments, management = false, rend
                     <div className="space-y-1.5 min-w-0 flex-1">
                       {management && (
                         <p className="text-xs font-bold text-[#67c4c7] uppercase tracking-wider truncate">
-                          {a.profiles?.full_name || 'Patient'} · <span className="font-mono text-slate-600">{a.profiles?.phone || 'No phone listed'}</span>
+                          {patientName(a)} {a.walk_in_name && <span className="text-slate-700">(Walk-in)</span>} · <span className="font-mono text-slate-600">{patientPhone(a) || 'No phone listed'}</span>
                         </p>
                       )}
                       <h3 className="font-extrabold text-base text-slate-900 truncate">{serviceName(a)}</h3>

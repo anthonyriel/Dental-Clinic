@@ -32,4 +32,6 @@ export function allowedActions(appointment, now = new Date()) {
   return []
 }
 export const serviceName = (appointment) => appointment.service_name || appointment.services?.name || 'Dental service'
+export const patientName = (appointment) => appointment.walk_in_name || appointment.profiles?.full_name || 'Patient'
+export const patientPhone = (appointment) => appointment.walk_in_phone || appointment.profiles?.phone || ''
 export const servicePrice = (appointment) => appointment.quoted_price ?? appointment.services?.price

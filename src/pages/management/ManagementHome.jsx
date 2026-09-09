@@ -3,7 +3,7 @@ import { CalendarDays, Clock, CircleHelp, ListChecks, ArrowUpRight, PlusCircle, 
 import { useQuery } from '../../hooks/useQuery'
 import { supabase } from '../../services/supabaseClient'
 import { managementSummary } from '../../lib/managementSummary'
-import { clinicDate, serviceName, statusLabel, normalizeStatus } from '../../lib/appointments'
+import { clinicDate, serviceName, statusLabel, normalizeStatus, patientName } from '../../lib/appointments'
 import { visitDateLabel } from '../../lib/presentation'
 import Feedback from '../../components/Feedback'
 
@@ -104,7 +104,7 @@ export default function ManagementHome() {
             {today.slice(0, 5).map(a => (
               <div key={a.id} className="flex flex-wrap gap-4 items-center justify-between py-4 first:pt-0 last:pb-0">
                 <div className="space-y-1">
-                  <h3 className="font-bold text-base text-slate-900">{a.profiles?.full_name || 'Patient'}</h3>
+                  <h3 className="font-bold text-base text-slate-900">{patientName(a)}{a.walk_in_name ? ' · Walk-in' : ''}</h3>
                   <p className="text-xs text-slate-500 font-medium">
                     {serviceName(a)} · <span className="text-slate-700 font-bold">{a.time_slot}</span>
                   </p>

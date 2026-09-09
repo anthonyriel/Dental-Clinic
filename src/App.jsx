@@ -25,6 +25,7 @@ import PasswordRecovery from './pages/PasswordRecovery'
 import AccountRedirect from './components/AccountRedirect'
 import ClinicSettings from './pages/management/ClinicSettings'
 import Notifications from './pages/Notifications'
+import WalkIn from './pages/management/WalkIn'
 import { Link } from 'react-router-dom'
 
 export default function App() {
@@ -72,6 +73,7 @@ export default function App() {
           >
             <Route index element={<ManagementHome />} />
             <Route path="schedule" element={<ScheduleManagement />} />
+            <Route path="walk-ins" element={<WalkIn />} />
             <Route path="services" element={<ServicesManagement />} />
             <Route path="settings" element={<ClinicSettings />} />
             <Route path="notifications" element={<Notifications />} />

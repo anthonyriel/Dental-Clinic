@@ -29,6 +29,7 @@ test('database with supplied UUID schema: booking, privacy, status transitions, 
     `)
     await db.exec(await readFile(new URL('./fixtures/signup-trigger.sql',import.meta.url),'utf8'))
     await db.exec(await readFile(new URL('../supabase/migrations/202609080001_functionality.sql',import.meta.url),'utf8'))
+    await db.exec(await readFile(new URL('../supabase/migrations/202609090001_walk_ins.sql',import.meta.url),'utf8'))
     await db.query(`insert into auth.users(id,raw_user_meta_data) values($1,$2)`,[
       '00000000-0000-0000-0000-000000000100',
       JSON.stringify({username:'signup-test',full_name:'Synthetic Signup',role:'owner',birthdate:'2000-01-01',region:'Test region',phone:'09123456789'})

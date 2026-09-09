@@ -8,13 +8,13 @@ import { CalendarDays, Clock, RefreshCw, AlertCircle } from 'lucide-react'
 import AvailabilityCalendar from './AvailabilityCalendar'
 import { visitDateLabel } from '../lib/presentation'
 
-export default function SlotPicker({ serviceId, excludeId = null, value, onChange, duration, calendarSettings }) {
-  const [date, setDate] = useState(value?.appointment_date || '')
+export default function SlotPicker({ serviceId, excludeId = null, value, onChange, duration, calendarSettings, walkIn = false }) {
+  const [date, setDate] = useState(value?.appointment_date || (walkIn ? clinicDate() : ''))
   
   const loader = useCallback(async () => {
     if (!date || !serviceId) return []
-    return result(supabase.rpc('available_slots', { p_date: date, p_service_id: String(serviceId), p_exclude_id: excludeId ? String(excludeId) : null }))
-  }, [date, serviceId, excludeId])
+    return result(supabase.rpc(walkIn ? 'available_walk_in_slots' : 'available_slots', { p_date: date, p_service_id: String(serviceId), p_exclude_id: excludeId ? String(excludeId) : null }))
+  }, [date, serviceId, excludeId, walkIn])
 
   const { data: slots, error, loading, refresh } = useQuery(loader, [], 30000)
   
@@ -39,7 +39,8 @@ export default function SlotPicker({ serviceId, excludeId = null, value, onChang
             <CalendarDays className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
             <input 
               type="date" 
-              min={clinicDate()} 
+              min={clinicDate()}
+              max={walkIn ? clinicDate() : undefined}
               required 
               value={date} 
               onChange={e => { setDate(e.target.value); onChange(null) }} 
