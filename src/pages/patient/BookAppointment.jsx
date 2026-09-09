@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Check, CheckCircle2, CalendarDays, Clock, Heart, ShieldCheck, UserRound, AlertTriangle } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, CheckCircle2, CalendarDays, Clock, Heart, ShieldCheck, UserRound, AlertTriangle, Plus } from 'lucide-react'
 import { supabase } from '../../services/supabaseClient'
 import { useAuth } from '../../context/auth'
 import { useQuery } from '../../hooks/useQuery'
@@ -19,7 +19,8 @@ export default function BookAppointment() {
   const [params] = useSearchParams()
   const services = useQuery(loadServices, [])
   const settings = useQuery(loadSettings)
-  const [serviceId, setServiceId] = useState(params.get('service') || '')
+  const [serviceIds, setServiceIds] = useState(params.get('service') ? [params.get('service')] : [])
+  const [selectingMore, setSelectingMore] = useState(false)
   const [step, setStep] = useState(0)
   const [slot, setSlot] = useState(null)
   const [details, setDetails] = useState({ full_name: profile?.full_name || '', phone: profile?.phone || '' })
@@ -29,12 +30,19 @@ export default function BookAppointment() {
   const heading = useRef(null)
   const inFlight = useRef(false)
   
-  const selected = services.data.find(s => String(s.id) === String(serviceId) && s.is_active !== false)
+  const selectedServices = serviceIds.map(id => services.data.find(s => String(s.id) === id && s.is_active !== false)).filter(Boolean)
+  const totalDuration = selectedServices.reduce((acc, s) => acc + (s.duration_minutes || 60), 0)
+  const totalPrice = selectedServices.some(s => s.price == null) ? null : selectedServices.reduce((acc, s) => acc + Number(s.price), 0)
   
   useEffect(() => { heading.current?.focus() }, [step, success])
   
-  function selectService(id) { 
-    setServiceId(id)
+  function toggleService(id) {
+    const strId = String(id)
+    setServiceIds(current => 
+      current.includes(strId) 
+        ? current.filter(item => item !== strId) 
+        : [...current, strId]
+    )
     setSlot(null)
     setError('') 
   }
@@ -46,6 +54,9 @@ export default function BookAppointment() {
   async function submit(e) {
     e.preventDefault()
     setError('')
+    if (!selectedServices.length || selectedServices.length !== serviceIds.length) {
+      setError('Choose available services before continuing.'); setStep(0); return
+    }
     const cleanPhone = normalizeMobile(details.phone)
     if (step >= 2 && (!details.full_name.trim() || !cleanPhone)) {
       setError('Enter your name and a valid Philippine mobile number, such as 0912 345 6789 or +63 912 345 6789.')
@@ -54,7 +65,7 @@ export default function BookAppointment() {
     }
 
     if (step < 3) {
-      if (!selected) { setStep(0); return }
+      if (serviceIds.length === 0) { setStep(0); return }
       if (step === 1 && !slot) return
       if (step === 2 && (!details.full_name.trim() || !cleanPhone)) { 
         setError('Please enter your name and contact number.')
@@ -63,7 +74,7 @@ export default function BookAppointment() {
       setStep(step + 1)
       return
     }
-    if (inFlight.current || !selected || !slot || !settings.data) return
+    if (inFlight.current || serviceIds.length === 0 || !slot || !settings.data) return
     inFlight.current = true
     setBusy(true)
     try {
@@ -71,7 +82,11 @@ export default function BookAppointment() {
         await updateOne('profiles', user.id, { full_name: details.full_name.trim(), phone: cleanPhone })
         refreshProfile()
       }
-      await result(supabase.rpc('book_appointment', { p_service_id: String(serviceId), p_date: slot.appointment_date, p_time_slot: slot.time_slot }))
+      await result(supabase.rpc('book_appointment', { 
+        p_service_ids: serviceIds, 
+        p_date: slot.appointment_date, 
+        p_time_slot: slot.time_slot 
+      }))
       setSuccess(true)
     } catch (err) { 
       setError(errorMessage(err))
@@ -106,11 +121,23 @@ export default function BookAppointment() {
           <div className="space-y-2">
             <span className="text-xs font-extrabold tracking-widest text-emerald-600 uppercase">REQUEST RECEIVED</span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">We look forward<br/>to seeing your smile.</h2>
-            <p className="text-sm text-slate-600 font-normal">Your appointment is pending clinic confirmation. Check your appointment updates for the next step.</p>
+            <p className="text-sm text-slate-600 font-normal">Your appointments are pending clinic confirmation. Check your appointment updates for the next step.</p>
           </div>
-          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-1">
-            <strong className="block text-base font-bold text-slate-900">{selected?.name}</strong>
-            <span className="text-xs font-semibold text-slate-500">{visitDateLabel(slot?.appointment_date)} · {slot?.time_slot}</span>
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2 text-left">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Selected Services ({selectedServices.length})</span>
+            {selectedServices.map(s => (
+              <div key={s.id} className="flex items-center justify-between text-xs border-b border-slate-100 pb-1.5 last:border-none last:pb-0">
+                <span className="font-bold text-slate-900">{s.name}</span>
+                <span className="font-mono text-slate-600">{priceLabel(s.price)}</span>
+              </div>
+            ))}
+            <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-bold text-xs">
+              <span className="text-slate-700">Total Visit Time & Est. Cost</span>
+              <span className="font-mono text-slate-900">{totalDuration} mins · {priceLabel(totalPrice)}</span>
+            </div>
+            <div className="text-[11px] font-semibold text-slate-500 pt-1">
+              {visitDateLabel(slot?.appointment_date)} · {slot?.time_slot}
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md transition-all inline-flex items-center justify-center gap-2" to="/dashboard/history">
@@ -152,7 +179,7 @@ export default function BookAppointment() {
                   {['What brings you in?', 'Find your perfect moment.', 'A little about you.', 'Looking good. Let’s review.'][step]}
                 </h2>
                 <p className="text-sm text-slate-600 font-normal">
-                  {['Choose the care you would like to book.', 'Available times match your treatment’s duration.', 'We’ll use these details to contact you about your visit.', 'Check the details below before sending your request.'][step]}
+                  {['Choose one or more care options to book.', 'Available times match your combined treatment duration.', 'We’ll use these details to contact you about your visit.', 'Check the details below before sending your request.'][step]}
                 </p>
               </div>
 
@@ -160,28 +187,41 @@ export default function BookAppointment() {
                 <>
                   {services.loading ? (
                     <p role="status" className="text-sm text-slate-500 py-8 text-center">Loading your care options...</p>
-                  ) : serviceId ? (
+                  ) : serviceIds.length > 0 && !selectingMore ? (
                     <div className="space-y-4">
-                      <div className="max-w-md">
-                        {services.data.filter(s => String(s.id) === String(serviceId)).map(service => (
-                          <ServiceCard key={service.id} service={service} selected={true} onSelect={selectService}/>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {services.data.filter(s => serviceIds.includes(String(s.id))).map(service => (
+                          <div key={service.id} className="relative">
+                            <ServiceCard service={service} selected={true} onSelect={() => toggleService(service.id)}/>
+                          </div>
                         ))}
                       </div>
                       <div>
                         <button 
                           type="button" 
-                          onClick={() => { setServiceId(''); setSlot(null); }}
-                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#67c4c7] hover:underline"
+                          onClick={() => setSelectingMore(true)}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#67c4c7]/10 hover:bg-[#67c4c7]/20 text-[#67c4c7] text-xs font-bold transition"
                         >
-                          ← Choose a different service
+                          <Plus size={15}/> Add another service to this booking
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {services.data.filter(s => s.is_active !== false).map(service => (
-                        <ServiceCard key={service.id} service={service} selected={String(service.id) === String(serviceId)} onSelect={selectService}/>
-                      ))}
+                    <div className="space-y-4">
+                      {selectingMore && (
+                        <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
+                          <span className="text-xs font-bold text-slate-700">Select additional services:</span>
+                          <button type="button" onClick={() => setSelectingMore(false)} className="text-xs font-bold text-[#67c4c7] hover:underline">Done selecting</button>
+                        </div>
+                      )}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {services.data.filter(s => s.is_active !== false).map(service => {
+                          const isSelected = serviceIds.includes(String(service.id))
+                          return (
+                            <ServiceCard key={service.id} service={service} selected={isSelected} onSelect={toggleService}/>
+                          )
+                        })}
+                      </div>
                     </div>
                   )}
                   {!services.loading && !services.error && !services.data.some(s => s.is_active !== false) && (
@@ -194,7 +234,7 @@ export default function BookAppointment() {
 
               {step === 1 && (
                 <div className="bg-slate-50/50 border border-slate-200 rounded-2xl p-4">
-                  <SlotPicker key={serviceId} serviceId={serviceId} value={slot} onChange={setSlot} duration={selected?.duration_minutes || 60} calendarSettings={settings.data} />
+                  <SlotPicker key={serviceIds.join(',')} serviceIds={serviceIds} value={slot} onChange={setSlot} duration={totalDuration} calendarSettings={settings.data} />
                 </div>
               )}
 
@@ -254,10 +294,16 @@ export default function BookAppointment() {
 
                   <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
                     <div className="p-2.5 rounded-xl bg-[#67c4c7]/10 text-[#67c4c7] shrink-0"><Heart size={20}/></div>
-                    <div className="space-y-0.5">
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Dental Care</span>
-                      <strong className="text-base font-bold text-slate-900 block">{selected?.name}</strong>
-                      <small className="text-xs text-slate-500 font-medium block">{priceLabel(selected?.price)} · {selected?.duration_minutes || 60} minutes</small>
+                    <div className="space-y-1 flex-1">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Selected Services Breakdown</span>
+                      <div className="space-y-1.5 pt-1">
+                        {selectedServices.map(s => (
+                          <div key={s.id} className="flex items-center justify-between text-xs border-b border-slate-200/60 pb-1 last:border-none">
+                            <span className="font-bold text-slate-900">{s.name} ({s.duration_minutes || 60}m)</span>
+                            <span className="font-mono font-bold text-slate-700">{priceLabel(s.price)}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -291,9 +337,9 @@ export default function BookAppointment() {
                 <button 
                   type="submit" 
                   className="px-6 py-3 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md transition-all inline-flex items-center gap-2 disabled:opacity-50" 
-                  disabled={busy || !selected || !!services.error || !!settings.error || !settings.data || (step === 1 && !slot)}
+                  disabled={busy || serviceIds.length === 0 || !!services.error || !!settings.error || !settings.data || (step === 1 && !slot)}
                 >
-                  {busy ? 'Sending request…' : step === 3 ? 'Request my appointment' : 'Continue'} <ArrowRight size={17}/>
+                  {busy ? 'Sending request…' : step === 3 ? 'Request my appointments' : 'Continue'} <ArrowRight size={17}/>
                 </button>
               </div>
             </form>
@@ -305,21 +351,25 @@ export default function BookAppointment() {
                   <Heart size={28} strokeWidth={1.5}/>
                 </div>
                 <div className="space-y-1">
-                  <h2 className="text-lg font-extrabold text-slate-900">{selected?.name || 'A little care for you.'}</h2>
-                  <p className="text-xs text-slate-500 font-normal">{selected ? 'One step closer to your next smile goal.' : 'Your appointment details will appear here as you make your selections.'}</p>
+                  <h2 className="text-lg font-extrabold text-slate-900">
+                    {selectedServices.length > 0 ? `${selectedServices.length} service(s) selected` : 'A little care for you.'}
+                  </h2>
+                  <p className="text-xs text-slate-500 font-normal">
+                    {selectedServices.length > 0 ? selectedServices.map(s => s.name).join(', ') : 'Your appointment details will appear here as you make your selections.'}
+                  </p>
                 </div>
                 
                 <dl className="space-y-3 pt-4 border-t border-slate-100 text-xs">
-                  <div className="flex items-center justify-between"><dt className="flex items-center gap-1.5 text-slate-500 font-semibold"><Clock size={15} className="text-slate-400"/> Duration</dt><dd className="font-bold text-slate-900">{selected ? (selected.duration_minutes || 60) + ' minutes' : '—'}</dd></div>
+                  <div className="flex items-center justify-between"><dt className="flex items-center gap-1.5 text-slate-500 font-semibold"><Clock size={15} className="text-slate-400"/> Total Duration</dt><dd className="font-bold text-slate-900">{selectedServices.length > 0 ? totalDuration + ' minutes' : '—'}</dd></div>
                   <div className="flex items-center justify-between"><dt className="flex items-center gap-1.5 text-slate-500 font-semibold"><CalendarDays size={15} className="text-slate-400"/> Date</dt><dd className="font-bold text-slate-900">{slot ? visitDateLabel(slot.appointment_date) : 'Not selected'}</dd></div>
                   {slot && <div className="flex items-center justify-between"><dt className="text-slate-500 font-semibold">Time</dt><dd className="font-bold text-slate-900">{slot.time_slot}</dd></div>}
                 </dl>
                 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Starting estimate</span>
-                  <strong className="text-lg font-extrabold text-slate-900 font-mono">{selected ? priceLabel(selected.price) : '—'}</strong>
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total estimate</span>
+                  <strong className="text-lg font-extrabold text-slate-900 font-mono">{selectedServices.length > 0 ? priceLabel(totalPrice) : '—'}</strong>
                 </div>
-                <small className="block text-[11px] text-slate-400 font-normal leading-relaxed">Your final treatment and price will be discussed with the clinic.</small>
+                <small className="block text-[11px] text-slate-400 font-normal leading-relaxed">Your final treatments and prices will be discussed with the clinic.</small>
               </div>
 
               <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-md flex items-center justify-between gap-4">

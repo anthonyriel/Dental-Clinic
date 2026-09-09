@@ -7,7 +7,7 @@ import { addDays, calendarDayState, monthDays, shiftMonth } from '../lib/calenda
 import { useQuery } from '../hooks/useQuery'
 import Feedback from './Feedback'
 
-async function loadMonthAvailability(month, today, settings, serviceId) {
+async function loadMonthAvailability(month, today, settings, servicesKey, excludeId) {
     const dates = monthDays(month).days.filter(day => calendarDayState(day, today, settings) === 'check')
     const counts = {}
     let index = 0
@@ -15,7 +15,7 @@ async function loadMonthAvailability(month, today, settings, serviceId) {
       while (index < dates.length) {
         const day = dates[index++]
         try {
-          const slots = await result(supabase.rpc('available_slots', { p_date: day, p_service_id: String(serviceId), p_exclude_id: null }))
+          const slots = await result(supabase.rpc('available_service_slots', { p_date: day, p_service_ids: JSON.parse(servicesKey), p_exclude_id: excludeId }))
           counts[day] = slots.length
         } catch { counts[day] = null }
       }
@@ -23,14 +23,15 @@ async function loadMonthAvailability(month, today, settings, serviceId) {
     return counts
 }
 
-export default function AvailabilityCalendar({ serviceId, settings, date, onSelect }) {
+export default function AvailabilityCalendar({ serviceIds, excludeId = null, settings, date, onSelect }) {
+  const servicesKey = JSON.stringify(serviceIds)
   const today = String(clinicDate())
   const lastDate = addDays(today, settings.booking_horizon_days)
   const [month, setMonth] = useState((date || today).slice(0, 7))
   const { days, offset } = monthDays(month)
   const loader = useCallback(async () => {
-    return loadMonthAvailability(month, today, settings, serviceId)
-  }, [month, today, settings, serviceId])
+    return loadMonthAvailability(month, today, settings, servicesKey, excludeId)
+  }, [month, today, settings, servicesKey, excludeId])
   const { data, loading, refresh } = useQuery(loader, {}, 0, { refreshOnFocus: false })
   const failed = Object.values(data).some(count => count === null)
   const title = new Intl.DateTimeFormat('en-PH', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${month}-01T12:00:00Z`))
@@ -117,7 +118,7 @@ export default function AvailabilityCalendar({ serviceId, settings, date, onSele
       </div>
 
       <p className="text-xs text-slate-500 font-normal leading-relaxed">
-        Availability is for your selected service. No times can mean fully booked, a special closure, or no remaining times that fit. Start times can overlap and are not a count of separate appointments. Select a date to check its latest times, or refresh this calendar to update the month.
+        Availability is for all your selected services together. No times can mean fully booked, a special closure, or no remaining times that fit. Start times can overlap and are not a count of separate appointments. Select a date to check its latest times, or refresh this calendar to update the month.
       </p>
 
       {loading && <p role="status" className="text-xs font-bold text-[#67c4c7] animate-pulse">Checking this month’s availability…</p>}

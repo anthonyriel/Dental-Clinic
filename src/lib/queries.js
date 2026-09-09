@@ -13,5 +13,5 @@ export async function allRows(makeQuery) {
 }
 export const loadServices = () => allRows(() => supabase.from('services').select('*').order('name').order('id'))
 export const loadSettings = () => result(supabase.from('clinic_settings').select('*').eq('id', 1).single())
-export const loadManagementAppointments = async () => sortAppointments(await allRows(() => supabase.from('appointments').select('*, services(name, price), profiles(full_name, phone)').order('appointment_date').order('id')))
-export const loadPatientAppointments = async (userId) => sortAppointments(await allRows(() => supabase.from('appointments').select('*, services(name, price)').eq('patient_id', userId).order('appointment_date').order('id')))
+export const loadManagementAppointments = async () => sortAppointments(await allRows(() => supabase.from('appointments').select('*, appointment_services(*), services(name, price), profiles(full_name, phone)').order('appointment_date').order('id')))
+export const loadPatientAppointments = async (userId) => sortAppointments(await allRows(() => supabase.from('appointments').select('*, appointment_services(*), services(name, price)').eq('patient_id', userId).order('appointment_date').order('id')))

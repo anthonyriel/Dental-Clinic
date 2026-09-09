@@ -8,24 +8,26 @@ import { CalendarDays, Clock, RefreshCw, AlertCircle } from 'lucide-react'
 import AvailabilityCalendar from './AvailabilityCalendar'
 import { visitDateLabel } from '../lib/presentation'
 
-export default function SlotPicker({ serviceId, excludeId = null, value, onChange, duration, calendarSettings, walkIn = false }) {
+export default function SlotPicker({ serviceId, serviceIds, excludeId = null, value, onChange, duration, calendarSettings, walkIn = false }) {
   const [date, setDate] = useState(value?.appointment_date || (walkIn ? clinicDate() : ''))
   
+  const servicesKey = JSON.stringify(serviceIds || (serviceId ? [String(serviceId)] : []))
   const loader = useCallback(async () => {
-    if (!date || !serviceId) return []
-    return result(supabase.rpc(walkIn ? 'available_walk_in_slots' : 'available_slots', { p_date: date, p_service_id: String(serviceId), p_exclude_id: excludeId ? String(excludeId) : null }))
-  }, [date, serviceId, excludeId, walkIn])
+    if (!date || (!JSON.parse(servicesKey).length && !excludeId)) return []
+    return result(supabase.rpc(walkIn ? 'available_walk_in_slots' : 'available_service_slots', { p_date: date, ...(walkIn ? { p_service_id: String(serviceId) } : { p_service_ids: JSON.parse(servicesKey) }), p_exclude_id: excludeId ? String(excludeId) : null }))
+  }, [date, serviceId, servicesKey, excludeId, walkIn])
 
   const { data: slots, error, loading, refresh } = useQuery(loader, [], 30000)
   
-  // Never retain a selection that a refresh reports as unavailable.
-  const valid = !error && !loading && slots.some(slot => slot.time_slot === value?.time_slot && slot.appointment_date === date)
+  const filteredSlots = (slots || []).filter(slot => slot.appointment_date === date)
+  const valid = !error && !loading && filteredSlots.some(slot => slot.time_slot === value?.time_slot && slot.appointment_date === date)
 
   return (
     <div className="space-y-6 text-left">
       {calendarSettings ? (
         <AvailabilityCalendar 
-          serviceId={serviceId} 
+          serviceIds={JSON.parse(servicesKey)}
+          excludeId={excludeId} 
           settings={calendarSettings} 
           date={date} 
           onSelect={day => { setDate(day); onChange(null); refresh() }}
@@ -70,15 +72,16 @@ export default function SlotPicker({ serviceId, excludeId = null, value, onChang
       {date && duration && (
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-100 px-4 py-2.5 rounded-xl border border-slate-200">
           <Clock size={15} className="text-[#67c4c7]" />
-          <span>{duration}-minute appointment · Full time ranges shown below</span>
+          <span>{duration}-minute visit · Times fit within clinic hours and breaks</span>
         </div>
       )}
 
       {date && !error && (
         <div className="space-y-3">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {slots.filter(slot => slot.appointment_date === date).map(slot => {
-              const isSelected = value?.time_slot === slot.time_slot && value?.appointment_date === date
+            {filteredSlots.map(slot => {
+              const displayRange = slot.time_slot
+              const isSelected = value?.time_slot === displayRange && value?.appointment_date === date
               return (
                 <button 
                   key={slot.time_slot} 
@@ -91,15 +94,15 @@ export default function SlotPicker({ serviceId, excludeId = null, value, onChang
                       : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
                   }`}
                 >
-                  {slot.time_slot}
+                  {displayRange}
                 </button>
               )
             })}
           </div>
 
-          {!slots.some(slot => slot.appointment_date === date) && (
+          {filteredSlots.length === 0 && (
             <p className="text-sm text-slate-500 text-center py-6 font-normal bg-slate-50 rounded-2xl border border-slate-200">
-              {loading ? 'Loading availability...' : 'No available times. Choose another date or refresh.'}
+              {loading ? 'Loading availability...' : 'No available times within working hours. Choose another date or refresh.'}
             </p>
           )}
         </div>

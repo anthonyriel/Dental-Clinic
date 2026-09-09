@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { CalendarDays, Clock, Search, X } from 'lucide-react'
-import { serviceName, servicePrice, statusLabel, normalizeStatus, patientName, patientPhone } from '../lib/appointments'
+import { CalendarDays, Clock, Search, X, Trash2 } from 'lucide-react'
+import { appointmentServices, serviceName, servicePrice, statusLabel, normalizeStatus, patientName, patientPhone } from '../lib/appointments'
 import { priceLabel } from '../lib/presentation'
 
-export default function AppointmentList({ appointments, management = false, renderActions }) {
+export default function AppointmentList({ appointments, management = false, renderActions, initialDate = '', initialStatus = '', onDelete }) {
   const [search, setSearch] = useState('')
-  const [date, setDate] = useState('')
-  const [status, setStatus] = useState('')
+  const [date, setDate] = useState(initialDate)
+  const [status, setStatus] = useState(initialStatus)
   const [page, setPage] = useState(0)
 
   const filtered = appointments.filter(a => 
@@ -16,6 +16,19 @@ export default function AppointmentList({ appointments, management = false, rend
   )
 
   const currentPage = Math.min(page, Math.max(0, Math.ceil(filtered.length / 20) - 1))
+
+  function formatTimestamp(isoString) {
+    if (!isoString) return ''
+    return new Intl.DateTimeFormat('en-PH', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'Asia/Manila'
+    }).format(new Date(isoString))
+  }
 
   return (
     <div className="space-y-6 text-left">
@@ -78,9 +91,13 @@ export default function AppointmentList({ appointments, management = false, rend
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filtered.slice(currentPage * 20, currentPage * 20 + 20).map(a => {
-              const monthShort = new Date(a.appointment_date + 'T12:00:00+08:00').toLocaleString('en-PH', { month: 'short', timeZone: 'Asia/Manila' })
-              const dayNum = Number(a.appointment_date.slice(-2))
               const statusNorm = normalizeStatus(a.status)
+              const targetDateStr = (statusNorm === 'completed' && a.completed_at) ? a.completed_at.slice(0, 10) :
+                                    (statusNorm === 'cancelled' && a.cancelled_at) ? a.cancelled_at.slice(0, 10) :
+                                    a.appointment_date
+
+              const monthShort = new Date(targetDateStr + 'T12:00:00+08:00').toLocaleString('en-PH', { month: 'short', timeZone: 'Asia/Manila' })
+              const dayNum = Number(targetDateStr.slice(-2))
 
               return (
                 <article key={a.id} className="bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-3xl p-6 shadow-sm flex flex-col justify-between gap-6 transition hover:border-[#67c4c7]/50">
@@ -96,12 +113,34 @@ export default function AppointmentList({ appointments, management = false, rend
                           {patientName(a)} {a.walk_in_name && <span className="text-slate-700">(Walk-in)</span>} · <span className="font-mono text-slate-600">{patientPhone(a) || 'No phone listed'}</span>
                         </p>
                       )}
-                      <h3 className="font-extrabold text-base text-slate-900 truncate">{serviceName(a)}</h3>
+                      <h3 className="font-extrabold text-base text-slate-900 break-words">{serviceName(a)}</h3>
+                      {appointmentServices(a).length > 1 && (
+                        <ul className="space-y-2 py-2 text-xs text-slate-600" aria-label="Services in this visit">
+                          {appointmentServices(a).map(service => (
+                            <li key={service.id} className="flex flex-wrap justify-between gap-1 border-b border-slate-100 pb-1">
+                              <span className="break-words">{service.service_name} · {service.duration_minutes} min</span>
+                              <span>{priceLabel(service.quoted_price)}{service.quoted_price != null && ' quoted'}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                       
                       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
-                        <span className="inline-flex items-center gap-1 font-mono"><CalendarDays size={14} className="text-[#67c4c7]" />{a.appointment_date}</span>
-                        <span>·</span>
-                        <span className="inline-flex items-center gap-1 font-mono"><Clock size={14} className="text-[#67c4c7]" />{a.time_slot}</span>
+                        {statusNorm === 'completed' && a.completed_at ? (
+                          <span className="inline-flex items-center gap-1 font-mono text-emerald-700">
+                            <Clock size={14} className="text-emerald-600" /> Completed: {formatTimestamp(a.completed_at)}
+                          </span>
+                        ) : statusNorm === 'cancelled' && a.cancelled_at ? (
+                          <span className="inline-flex items-center gap-1 font-mono text-red-700">
+                            <Clock size={14} className="text-red-600" /> Cancelled: {formatTimestamp(a.cancelled_at)}
+                          </span>
+                        ) : (
+                          <>
+                            <span className="inline-flex items-center gap-1 font-mono"><CalendarDays size={14} className="text-[#67c4c7]" />{a.appointment_date}</span>
+                            <span>·</span>
+                            <span className="inline-flex items-center gap-1 font-mono"><Clock size={14} className="text-[#67c4c7]" />{a.time_slot}</span>
+                          </>
+                        )}
                       </div>
 
                       {a.cancellation_reason && (
@@ -114,6 +153,11 @@ export default function AppointmentList({ appointments, management = false, rend
                           <strong className="font-bold">Clinic response:</strong> {a.cancellation_resolution}
                         </p>
                       )}
+                      {a.notes && (
+                        <p className="text-xs text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl font-medium mt-1">
+                          <strong className="font-bold">Clinic Note:</strong> {a.notes}
+                        </p>
+                      )}
 
                       <div className="pt-2">
                         {renderActions?.(a)}
@@ -122,13 +166,27 @@ export default function AppointmentList({ appointments, management = false, rend
                   </div>
 
                   <div className="flex items-center justify-between shrink-0 border-t pt-4 border-slate-100 gap-2">
-                    <span className={'px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider status-' + statusNorm}>
-                      {statusLabel(a.status)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={'px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider status-' + statusNorm}>
+                        {statusLabel(a.status)}
+                      </span>
+                      {management && (statusNorm === 'cancelled' || statusNorm === 'no_show') && onDelete && (
+                        <button 
+                          type="button"
+                          onClick={() => onDelete(a)}
+                          className="p-1.5 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition shadow-2xs"
+                          title="Permanently remove appointment"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
                     {servicePrice(a) != null && (
                       <div className="text-right font-mono">
                         <strong className="block text-sm font-extrabold text-slate-900">{priceLabel(servicePrice(a))}</strong>
-                        <small className="block text-[10px] text-slate-400 font-sans font-medium">{a.quote_is_estimate !== false ? 'Legacy estimate' : 'Quoted price'}</small>
+                        <small className="block text-[10px] text-slate-400 font-sans font-medium">
+                          {statusNorm === 'completed' && a.price != null ? 'Recorded visit total' : a.quote_is_estimate ? 'Estimated quote' : 'Quoted price'}
+                        </small>
                       </div>
                     )}
                   </div>

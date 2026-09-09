@@ -12,12 +12,12 @@ const loadSummary = () => managementSummary(supabase, clinicDate())
 export default function ManagementHome() {
   const schedule = useQuery(loadSummary, null, 30000)
   const today = schedule.data?.today || []
-  
+
   const cards = [
-    ['Today’s appointments', schedule.data?.todayCount, CalendarDays, 'Your day at a glance'],
-    ['Pending bookings', schedule.data?.pendingCount, Clock, 'Waiting for your confirmation'],
-    ['Cancellation requests', schedule.data?.cancellationCount, CircleHelp, 'Patients needing a decision'],
-    ['All appointments', schedule.data?.totalCount, ListChecks, 'The complete clinic schedule']
+    ['Today’s appointments', schedule.data?.todayCount, CalendarDays, 'Your day at a glance', `/management/schedule?date=${clinicDate()}`],
+    ['Pending bookings', schedule.data?.pendingCount, Clock, 'Waiting for your confirmation', '/management/schedule?status=pending'],
+    ['Cancellation requests', schedule.data?.cancellationCount, CircleHelp, 'Patients needing a decision', '/management/schedule?status=cancellation+requested'],
+    ['All appointments', schedule.data?.totalCount, ListChecks, 'The complete clinic schedule', '/management/schedule']
   ]
 
   return (
@@ -47,10 +47,10 @@ export default function ManagementHome() {
 
       {!schedule.error && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {cards.map(([label, value, Icon, description]) => (
+          {cards.map(([label, value, Icon, description, linkPath]) => (
             <Link 
               key={label} 
-              to="/management/schedule" 
+              to={linkPath} 
               className="bg-white/90 backdrop-blur-md border border-slate-200/80 p-4 sm:p-6 rounded-3xl shadow-sm flex flex-col justify-between hover:border-[#67c4c7]/50 transition group text-left"
             >
               <div className="flex items-center justify-between text-[#67c4c7] mb-3 sm:mb-4">
@@ -72,7 +72,7 @@ export default function ManagementHome() {
       <section className="bg-white/90 backdrop-blur-md mt-6 p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
         <div className="flex justify-between items-center gap-4 border-b border-slate-100 pb-4">
           <h2 className="font-bold text-lg text-slate-900">Today at the clinic</h2>
-          <Link className="inline-flex items-center gap-1 text-sm font-bold text-[#67c4c7] hover:underline" to="/management/schedule">
+          <Link className="inline-flex items-center gap-1 text-sm font-bold text-[#67c4c7] hover:underline" to={`/management/schedule?date=${clinicDate()}`}>
             View all <ArrowUpRight size={16}/>
           </Link>
         </div>
