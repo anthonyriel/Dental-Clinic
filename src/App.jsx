@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import PublicLayout from './layouts/PublicLayout'
+import AuthLayout from './layouts/AuthLayout'
 import ClientLayout from './layouts/ClientLayout'
 import ManagementLayout from './layouts/ManagementLayout'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -39,14 +40,17 @@ export default function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<PasswordRecovery />} />
             <Route path="/reset-password" element={<PasswordRecovery reset />} />
             <Route path="*" element={<div className="p-8"><h1>Page not found</h1><Link to="/">Return home</Link></div>} />
           </Route>
 
           {/* Patient Portal */}
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Route>
+
           <Route 
             path="/dashboard" 
             element={
