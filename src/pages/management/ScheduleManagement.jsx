@@ -7,7 +7,7 @@ import { result, errorMessage } from '../../lib/data'
 import Feedback from '../../components/Feedback'
 import AppointmentList from '../../components/AppointmentList'
 import SlotPicker from '../../components/SlotPicker'
-import { RefreshCw, X, CheckCircle2 } from 'lucide-react'
+import { RefreshCw, X } from 'lucide-react'
 
 export default function ScheduleManagement() {
   const schedule = useQuery(loadManagementAppointments, [], 30000)
@@ -33,7 +33,7 @@ export default function ScheduleManagement() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto pb-12 text-left">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12 text-left">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>

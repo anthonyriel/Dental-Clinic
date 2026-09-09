@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ArrowRight, ArrowLeft, Check, CheckCircle2, CalendarDays, Clock, Heart, ShieldCheck, UserRound } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, CheckCircle2, CalendarDays, Clock, Heart, ShieldCheck, UserRound, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../services/supabaseClient'
 import { useAuth } from '../../context/auth'
 import { useQuery } from '../../hooks/useQuery'
@@ -37,14 +37,29 @@ export default function BookAppointment() {
     setSlot(null)
     setError('') 
   }
+
+  function handlePhoneChange(e) {
+    const raw = e.target.value.replace(/\D/g, '')
+    let formatted = raw
+    if (raw.startsWith('09')) {
+      if (raw.length > 4 && raw.length <= 7) {
+        formatted = `${raw.slice(0, 4)} ${raw.slice(4)}`
+      } else if (raw.length > 7) {
+        formatted = `${raw.slice(0, 4)} ${raw.slice(4, 7)} ${raw.slice(7, 11)}`
+      }
+    }
+    setDetails({...details, phone: formatted})
+  }
   
   async function submit(e) {
     e.preventDefault()
     setError('')
+    const cleanPhone = details.phone.replace(/\s+/g, '')
+
     if (step < 3) {
       if (!selected) { setStep(0); return }
       if (step === 1 && !slot) return
-      if (step === 2 && (!details.full_name.trim() || !details.phone.trim())) { 
+      if (step === 2 && (!details.full_name.trim() || !cleanPhone)) { 
         setError('Please enter your name and contact number.')
         return 
       }
@@ -55,8 +70,8 @@ export default function BookAppointment() {
     inFlight.current = true
     setBusy(true)
     try {
-      if (details.full_name.trim() !== profile.full_name || details.phone.trim() !== profile.phone) {
-        await updateOne('profiles', user.id, { full_name: details.full_name.trim(), phone: details.phone.trim() })
+      if (details.full_name.trim() !== profile.full_name || cleanPhone !== profile.phone) {
+        await updateOne('profiles', user.id, { full_name: details.full_name.trim(), phone: cleanPhone })
         refreshProfile()
       }
       await result(supabase.rpc('book_appointment', { p_service_id: String(serviceId), p_date: slot.appointment_date, p_time_slot: slot.time_slot }))
@@ -148,6 +163,23 @@ export default function BookAppointment() {
                 <>
                   {services.loading ? (
                     <p role="status" className="text-sm text-slate-500 py-8 text-center">Loading your care options...</p>
+                  ) : serviceId ? (
+                    <div className="space-y-4">
+                      <div className="max-w-md">
+                        {services.data.filter(s => String(s.id) === String(serviceId)).map(service => (
+                          <ServiceCard key={service.id} service={service} selected={true} onSelect={selectService}/>
+                        ))}
+                      </div>
+                      <div>
+                        <button 
+                          type="button" 
+                          onClick={() => { setServiceId(''); setSlot(null); }}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#67c4c7] hover:underline"
+                        >
+                          ← Choose a different service
+                        </button>
+                      </div>
+                    </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {services.data.filter(s => s.is_active !== false).map(service => (
@@ -190,13 +222,12 @@ export default function BookAppointment() {
                       type="tel" 
                       autoComplete="tel" 
                       required 
-                      pattern="(09[0-9]{9}|[+]639[0-9]{9})" 
-                      title="Use 09 followed by 9 digits, or +639 followed by 9 digits." 
-                      placeholder="09123456789" 
+                      placeholder="0912 345 6789" 
                       value={details.phone} 
-                      onChange={e => setDetails({...details, phone: e.target.value})}
+                      onChange={handlePhoneChange}
                       className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                     />
+                    <span className="text-xs text-slate-400 block pt-1">Format: 09XX XXX XXXX (Philippine mobile number)</span>
                   </div>
 
                   <div className="space-y-1.5">
@@ -241,10 +272,10 @@ export default function BookAppointment() {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-sky-50 border border-sky-100 text-sky-900 text-xs sm:text-sm">
-                    <ShieldCheck size={20} className="shrink-0 text-[#67c4c7] mt-0.5"/>
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm shadow-2xs">
+                    <AlertTriangle size={20} className="shrink-0 text-amber-600 mt-0.5"/>
                     <p className="leading-relaxed font-normal">
-                      This is an appointment request. Your visit is booked once the clinic confirms it. Online cancellation requests require at least <strong>{settings.data?.cancellation_hours} hours</strong> notice and clinic approval. For later changes, please call the clinic.
+                      This is an appointment request. Your visit is confirmed by the clinic. Online cancellation requests require at least <strong>{settings.data?.cancellation_hours} hours</strong> ({Number(settings.data?.cancellation_hours || 0) / 24} days) notice and clinic approval. For urgent changes inside this window, please call the clinic directly.
                     </p>
                   </div>
                 </div>

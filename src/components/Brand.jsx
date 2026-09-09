@@ -12,7 +12,7 @@ export default function Brand({ compact = false, stacked = false }) {
       </span>
       {!compact && (
         <div className="flex flex-col">
-          <span className="font-extrabold text-slate-900 tracking-tight text-base sm:text-lg leading-none group-hover:text-[#67c4c7] transition-colors">
+          <span className="font-extrabold text-[#67c4c7] tracking-tight text-base sm:text-lg leading-none group-hover:text-slate-900 transition-colors">
             Dentaprime
           </span>
           <span className={stacked ? "text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-1 leading-tight block font-mono" : "text-[10px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 font-mono"}>

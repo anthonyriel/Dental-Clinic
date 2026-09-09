@@ -7,7 +7,7 @@ import { canRequestCancellation, normalizeStatus } from '../../lib/appointments'
 import { result, errorMessage } from '../../lib/data'
 import Feedback from '../../components/Feedback'
 import AppointmentList from '../../components/AppointmentList'
-import { History, CalendarDays, X, ShieldAlert } from 'lucide-react'
+import { History, CalendarDays, X, ShieldAlert, PhoneCall } from 'lucide-react'
 
 export default function AppointmentHistory() {
   const { user } = useAuth()
@@ -62,9 +62,13 @@ export default function AppointmentHistory() {
                   <ShieldAlert size={14}/> Request cancellation
                 </button>
               ) : (
-                <p className="text-xs text-slate-500 font-normal mt-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                  For cancellation or rescheduling, <a className="underline text-[#67c4c7] font-bold" href="tel:09703857431">call the clinic</a>.
-                </p>
+                <a 
+                  href="tel:09703857431"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-bold transition border border-amber-200 shadow-2xs mt-3 group"
+                >
+                  <PhoneCall size={14} className="text-amber-600 group-hover:scale-110 transition-transform" />
+                  <span>Too close to visit? Call Clinic directly</span>
+                </a>
               )
             )} 
           />

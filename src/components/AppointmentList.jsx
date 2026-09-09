@@ -76,29 +76,29 @@ export default function AppointmentList({ appointments, management = false, rend
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filtered.slice(currentPage * 20, currentPage * 20 + 20).map(a => {
               const monthShort = new Date(a.appointment_date + 'T12:00:00+08:00').toLocaleString('en-PH', { month: 'short', timeZone: 'Asia/Manila' })
               const dayNum = Number(a.appointment_date.slice(-2))
               const statusNorm = normalizeStatus(a.status)
 
               return (
-                <article key={a.id} className="bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 transition hover:border-[#67c4c7]/50">
+                <article key={a.id} className="bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-3xl p-6 shadow-sm flex flex-col justify-between gap-6 transition hover:border-[#67c4c7]/50">
                   <div className="flex items-start gap-4">
-                    <div className="shrink-0 bg-[#67c4c7]/10 text-[#67c4c7] border border-[#67c4c7]/20 rounded-2xl p-3 text-center min-w-70px font-mono shadow-2xs">
+                    <div className="shrink-0 bg-[#67c4c7]/10 text-[#67c4c7] border border-[#67c4c7]/20 rounded-2xl p-3 text-center min-w-17.5 font-mono shadow-2xs">
                       <span className="block text-[11px] font-bold uppercase tracking-wider">{monthShort}</span>
                       <strong className="block text-xl font-extrabold text-slate-900 leading-tight">{dayNum}</strong>
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 min-w-0 flex-1">
                       {management && (
-                        <p className="text-xs font-bold text-[#67c4c7] uppercase tracking-wider">
+                        <p className="text-xs font-bold text-[#67c4c7] uppercase tracking-wider truncate">
                           {a.profiles?.full_name || 'Patient'} · <span className="font-mono text-slate-600">{a.profiles?.phone || 'No phone listed'}</span>
                         </p>
                       )}
-                      <h3 className="font-extrabold text-lg text-slate-900">{serviceName(a)}</h3>
+                      <h3 className="font-extrabold text-base text-slate-900 truncate">{serviceName(a)}</h3>
                       
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
                         <span className="inline-flex items-center gap-1 font-mono"><CalendarDays size={14} className="text-[#67c4c7]" />{a.appointment_date}</span>
                         <span>·</span>
                         <span className="inline-flex items-center gap-1 font-mono"><Clock size={14} className="text-[#67c4c7]" />{a.time_slot}</span>
@@ -121,13 +121,13 @@ export default function AppointmentList({ appointments, management = false, rend
                     </div>
                   </div>
 
-                  <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 gap-2">
+                  <div className="flex items-center justify-between shrink-0 border-t pt-4 border-slate-100 gap-2">
                     <span className={'px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider status-' + statusNorm}>
                       {statusLabel(a.status)}
                     </span>
                     {servicePrice(a) != null && (
                       <div className="text-right font-mono">
-                        <strong className="block text-base font-extrabold text-slate-900">{priceLabel(servicePrice(a))}</strong>
+                        <strong className="block text-sm font-extrabold text-slate-900">{priceLabel(servicePrice(a))}</strong>
                         <small className="block text-[10px] text-slate-400 font-sans font-medium">{a.quote_is_estimate !== false ? 'Legacy estimate' : 'Quoted price'}</small>
                       </div>
                     )}

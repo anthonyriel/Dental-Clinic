@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowUpRight, ArrowRight, MapPin, ShieldCheck, CalendarDays, Heart, Sparkles } from 'lucide-react'
+import { ArrowUpRight, MapPin, ShieldCheck, CalendarDays, Heart, Sparkles } from 'lucide-react'
 import { useAuth } from '../context/auth'
 import { useQuery } from '../hooks/useQuery'
 import { loadServices } from '../lib/queries'
@@ -15,8 +15,8 @@ export default function Home() {
   return (
     <div className="space-y-16 lg:space-y-24 pb-12">
       {/* Hero Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pt-4 lg:pt-8">
-        <div className="lg:col-span-7 space-y-6 text-left">
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-4 lg:pt-10">
+        <div className="lg:col-span-6 space-y-6 text-left lg:pr-8 xl:pr-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold tracking-wider uppercase border border-[#67c4c7]/20 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-[#67c4c7] animate-pulse" /> YOUR SMILE, IN GOOD HANDS
           </div>
@@ -32,15 +32,9 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <Link 
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all" 
-              to={bookPath}
-            >
-              Let's book your visit <ArrowUpRight size={19}/>
-            </Link>
-            <Link 
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-700 hover:text-[#67c4c7] transition-colors px-2 py-1" 
               to="/services"
             >
-              Explore our care <ArrowRight size={17}/>
+              Explore our care <ArrowUpRight size={19}/>
             </Link>
           </div>
           
@@ -50,8 +44,8 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="lg:col-span-5 flex justify-center">
-          <div className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div className="lg:col-span-6 flex justify-center lg:justify-end">
+          <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
             <SmileArt />
           </div>
         </div>
@@ -123,7 +117,7 @@ export default function Home() {
               to={bookPath} 
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md transition-all"
             >
-              Make time for you <ArrowUpRight size={18}/>
+              Find your reason to smile <ArrowUpRight size={18}/>
             </Link>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/auth'
 import { Menu, X, ArrowUpRight } from 'lucide-react'
@@ -17,6 +17,10 @@ export default function PublicLayout() {
   const location = useLocation()
   const [menuAt, setMenuAt] = useState(null)
   
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [location.pathname])
+
   const isOpen = menuAt === location.pathname
   
   return (
