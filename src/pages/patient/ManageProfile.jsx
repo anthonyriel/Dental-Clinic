@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { supabase } from '../../services/supabaseClient'
 import { useAuth } from '../../context/auth'
 import AddressFields from '../../components/AddressFields'
+import AvatarCropper from '../../components/AvatarCropper'
 import { clinicDate } from '../../lib/appointments'
 import {  
   User, Phone, Calendar, MapPin, Lock, Camera,  
-  AlertCircle, CheckCircle2, AtSign, Mail, ZoomIn, Check, X, Sliders, ShieldCheck  
+  AlertCircle, CheckCircle2, AtSign, Mail, Sliders, ShieldCheck  
 } from 'lucide-react'
 
 export default function ManageProfile() {
@@ -41,10 +42,6 @@ export default function ManageProfile() {
 
   // Avatar Cropper State
   const [rawImageSrc, setRawImageSrc] = useState(null)
-  const [zoom, setZoom] = useState(1)
-  const [panX, setPanX] = useState(0)
-  const [panY, setPanY] = useState(0)
-  const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -61,9 +58,6 @@ export default function ManageProfile() {
     const reader = new FileReader()
     reader.onload = () => {
       setRawImageSrc(reader.result)
-      setZoom(1)
-      setPanX(0)
-      setPanY(0)
     }
     reader.readAsDataURL(file)
   }
@@ -71,62 +65,18 @@ export default function ManageProfile() {
   const handleReAdjustCurrentAvatar = () => {
     if (!formData.avatarUrl) return
     setRawImageSrc(formData.avatarUrl)
-    setZoom(1)
-    setPanX(0)
-    setPanY(0)
   }
 
-  const handleSaveCroppedImage = async () => {
-    if (!rawImageSrc) return
-    setUploadingAvatar(true)
-    setError('')
-
-    const canvas = document.createElement('canvas')
-    canvas.width = 400
-    canvas.height = 400
-    const ctx = canvas.getContext('2d')
-
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onerror = () => { setUploadingAvatar(false); setError("Could not load this image. Choose another file.") }
-    img.src = rawImageSrc
-    img.onload = async () => {
-      ctx.fillStyle = '#0f172a'
-      ctx.fillRect(0, 0, 400, 400)
-
-      ctx.save()
-      const ratio = 400 / 192
-      ctx.translate(200, 200)
-      ctx.scale(zoom * ratio, zoom * ratio)
-      ctx.translate(panX, panY)
-      ctx.drawImage(img, -img.width / 2, -img.height / 2)
-      ctx.restore()
-
-      canvas.toBlob(async (blob) => {
-        try {
-          if (!blob) throw new Error('Image could not be processed.')
-          const fileName = `${user.id}-${Date.now()}.jpg`
-          const { error: uploadError } = await supabase.storage
-            .from('avatars')
-            .upload(fileName, blob, { contentType: 'image/jpeg' })
-
-          if (uploadError) throw uploadError
-
-          const { data } = supabase.storage.from('avatars').getPublicUrl(fileName)
-          const publicUrl = data.publicUrl
-
-          const { error: profileError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id).select().single()
-          if (profileError) throw profileError
-          setFormData(prev => ({ ...prev, avatarUrl: publicUrl }))
-          refreshProfile()
-          setRawImageSrc(null)
-        } catch (err) {
-          setError('Avatar upload failed: ' + err.message)
-        } finally {
-          setUploadingAvatar(false)
-        }
-      }, 'image/jpeg', 0.95)
-    }
+  const handleSaveCroppedImage = async (blob) => {
+    const fileName = user.id + '-' + Date.now() + '.jpg'
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, blob, { contentType: 'image/jpeg' })
+    if (uploadError) throw uploadError
+    const { data } = supabase.storage.from('avatars').getPublicUrl(fileName)
+    const { error: profileError } = await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', user.id).select().single()
+    if (profileError) throw profileError
+    setFormData(previous => ({ ...previous, avatarUrl: data.publicUrl }))
+    refreshProfile()
+    setRawImageSrc(null)
   }
 
   const handleUpdateProfile = async (e) => {
@@ -227,94 +177,7 @@ export default function ManageProfile() {
         </div>
       )}
 
-      {/* Image Cropper Modal / Drawer */}
-      {rawImageSrc && (
-        <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl space-y-6 shadow-xl border border-slate-800">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-            <h3 className="font-bold text-lg flex items-center gap-2 text-white">
-              <Camera className="w-5 h-5 text-[#67c4c7]" /> Adjust & Crop Profile Picture
-            </h3>
-            <span className="text-xs text-slate-400">Position your image perfectly</span>
-          </div>
-
-          <div className="flex flex-col items-center justify-center space-y-6">
-            <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-[#67c4c7]/80 bg-slate-950 flex items-center justify-center shadow-2xl">
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <img 
-                  src={rawImageSrc} 
-                  alt="Crop preview" 
-                  style={{
-                    transform: `scale(${zoom}) translate(${panX}px, ${panY}px)`,
-                    transition: 'transform 0.05s ease-out',
-                    maxWidth: 'none',
-                    maxHeight: 'none'
-                  }}
-                  className="object-contain"
-                />
-              </div>
-            </div>
-
-            <div className="w-full max-w-md space-y-4 bg-slate-800/60 p-5 rounded-2xl border border-slate-700/80 backdrop-blur-md">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-300">
-                <span className="flex items-center gap-1.5"><ZoomIn className="w-4 h-4 text-[#67c4c7]" /> Zoom Level</span>
-                <span className="font-mono bg-slate-900 px-2 py-0.5 rounded text-[#67c4c7]">{zoom.toFixed(2)}x</span>
-              </div>
-              <input 
-                type="range" 
-                min="0.2" 
-                max="3" 
-                step="0.05" 
-                value={zoom} 
-                onChange={(e) => setZoom(parseFloat(e.target.value))} 
-                className="w-full accent-[#67c4c7] cursor-pointer h-2 bg-slate-900 rounded-lg"
-              />
-
-              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-700/60">
-                <div>
-                  <label className="block text-[11px] text-slate-400 uppercase font-bold tracking-wider mb-1.5">Pan X ({panX}px)</label>
-                  <input 
-                    type="range" 
-                    min="-150" 
-                    max="150" 
-                    value={panX} 
-                    onChange={(e) => setPanX(parseInt(e.target.value))} 
-                    className="w-full accent-[#67c4c7] cursor-pointer h-2 bg-slate-900 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] text-slate-400 uppercase font-bold tracking-wider mb-1.5">Pan Y ({panY}px)</label>
-                  <input 
-                    type="range" 
-                    min="-150" 
-                    max="150" 
-                    value={panY} 
-                    onChange={(e) => setPanY(parseInt(e.target.value))} 
-                    className="w-full accent-[#67c4c7] cursor-pointer h-2 bg-slate-900 rounded-lg"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 w-full max-w-md pt-2">
-              <button
-                type="button"
-                onClick={() => setRawImageSrc(null)}
-                className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2 border border-slate-700"
-              >
-                <X className="w-4 h-4" /> Cancel
-              </button>
-              <button
-                type="button"
-                disabled={uploadingAvatar}
-                onClick={handleSaveCroppedImage}
-                className="flex-1 py-3 bg-[#67c4c7] hover:bg-[#57b3b6] text-white rounded-xl font-bold text-xs transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Check className="w-4 h-4" /> {uploadingAvatar ? 'Saving Avatar...' : 'Crop & Save Image'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {rawImageSrc && <AvatarCropper key={rawImageSrc} src={rawImageSrc} onSave={handleSaveCroppedImage} onCancel={() => setRawImageSrc(null)} />}
 
       {/* Main Profile Details Form */}
       <form onSubmit={handleUpdateProfile} className="bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-8">
