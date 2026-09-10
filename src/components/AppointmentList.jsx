@@ -113,12 +113,12 @@ export default function AppointmentList({ appointments, management = false, rend
                           {patientName(a)} {a.walk_in_name && <span className="text-slate-700">(Walk-in)</span>} · <span className="font-mono text-slate-600">{patientPhone(a) || 'No phone listed'}</span>
                         </p>
                       )}
-                      <h3 className="font-extrabold text-base text-slate-900 break-words">{serviceName(a)}</h3>
+                      <h3 className="font-extrabold text-base text-slate-900 wrap-break-word">{serviceName(a)}</h3>
                       {appointmentServices(a).length > 0 && (
                         <ul className="space-y-2 py-2 text-xs text-slate-600" aria-label="Services in this visit">
                           {appointmentServices(a).map(service => (
                             <li key={service.id} className="flex flex-wrap justify-between gap-1 border-b border-slate-100 pb-1">
-                              <span className="break-words">{service.service_name} · {service.duration_minutes} min</span>
+                              <span className="wrap-break-word">{service.service_name} · {service.duration_minutes} min</span>
                               <span className="text-right">
                                 {service.paid_amount != null ? `${priceLabel(service.paid_amount)} paid` : statusNorm === 'completed' ? 'Paid amount not recorded' : `${priceLabel(service.quoted_price)}${service.quoted_price != null ? ' quoted' : ''}`}
                               </span>

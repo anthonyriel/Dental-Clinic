@@ -23,7 +23,7 @@ export default function PublicLayout() {
 
   
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-[#67c4c7]/30 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pb-0">
+    <div className="min-h-screen flex flex-col bg-[#e4f2ef] text-slate-900 selection:bg-[#67c4c7]/30 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <a className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-slate-900" href="#main-content">Skip to content</a>
       
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
