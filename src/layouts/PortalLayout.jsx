@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { LayoutDashboard, CalendarDays, History, UserRound, Bell, Stethoscope, Users, SlidersHorizontal, ArrowUpRight, LogOut, House, BarChart3 } from 'lucide-react'
 import Brand from '../components/Brand'
 import MobileBottomNav from '../components/MobileBottomNav'
@@ -6,6 +6,7 @@ import { useAuth } from '../context/auth'
 
 export default function PortalLayout({ management=false }) {
   const { user, profile, role, signOut } = useAuth()
+  const { pathname } = useLocation()
   
   const base = management ? '/management' : '/dashboard'
   
@@ -27,13 +28,14 @@ export default function PortalLayout({ management=false }) {
       
   links.unshift(['/', 'Home', House])
   links.push([base+'/notifications', 'Updates', Bell], [base+'/profile', 'My profile', UserRound])
+  const current = links.find(([path]) => path === pathname)?.[1] || 'Your account'
   
   return (
     <div className="min-h-screen flex bg-[#e4f2ef] text-slate-900 selection:bg-[#67c4c7]/30 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <a className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-slate-900" href="#main-content">Skip to content</a>
       
       {/* Sidebar Navigation */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-50 w-72 bg-white/95 backdrop-blur-xl border-r border-slate-200/80 flex-col">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-50 w-72 bg-[#edf6f3]/90 backdrop-blur-xl border-r border-[#bfd8d1]/60 shadow-[4px_0_24px_-12px_rgba(21,52,56,0.12)] flex-col">
         <div className="p-6 flex items-center justify-between border-b border-slate-100">
           <Brand stacked />
         </div>
@@ -91,11 +93,16 @@ export default function PortalLayout({ management=false }) {
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-72">
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-2xs h-20 px-4 sm:px-8 flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center gap-4 min-w-0">
+          <div className="flex items-center gap-4 min-w-0 lg:hidden">
             <Brand stacked />
           </div>
+          <div className="hidden lg:flex items-center gap-3 min-w-0 text-sm">
+            <span className="shrink-0 text-[11px] font-bold uppercase tracking-wider text-slate-500">{management ? 'Clinic workspace' : 'My smile space'}</span>
+            <span className="text-slate-300" aria-hidden="true">/</span>
+            <strong className="truncate font-bold text-slate-900">{current}</strong>
+          </div>
           
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 lg:ml-auto">
             <Link 
               to={base+'/notifications'} 
               className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors relative" 

@@ -19,7 +19,10 @@ export default function ClinicHours() {
   }
 
   const s = settings.data
-  const daysText = s.opening_days.map(day => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day]).join(', ') || 'Online bookings closed'
+  const days = [...new Set(s.opening_days)].sort((a, b) => a - b)
+  const daysText = days.join(',') === '1,2,3,4,5,6'
+    ? 'Monday to Saturday'
+    : days.map(day => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day]).join(', ') || 'Online bookings closed'
 
   return (
     <div className="space-y-2 text-left text-sm">
