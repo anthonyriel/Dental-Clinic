@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+.floating-nav-scroll { scrollbar-width: none; }
+.floating-nav-scroll::-webkit-scrollbar { display: none; }
+
 @theme {
   --color-brand: #67c4c7;
   --color-sky-50: #edf9f8;
