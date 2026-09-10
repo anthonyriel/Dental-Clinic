@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CalendarDays, History, UserRound, Bell, Stethoscope, Users, SlidersHorizontal, ArrowUpRight, LogOut, Menu, X, BarChart3 } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, History, UserRound, Bell, Stethoscope, Users, SlidersHorizontal, ArrowUpRight, LogOut, House, BarChart3 } from 'lucide-react'
 import Brand from '../components/Brand'
 import MobileBottomNav from '../components/MobileBottomNav'
 import { useAuth } from '../context/auth'
@@ -8,9 +7,7 @@ import { useAuth } from '../context/auth'
 export default function PortalLayout({ management=false }) {
   const { user, profile, role, signOut } = useAuth()
   const location = useLocation()
-  const [menuAt, setMenuAt] = useState(null)
   
-  const open = menuAt === location.pathname
   const base = management ? '/management' : '/dashboard'
   
   const links = management 
@@ -29,24 +26,18 @@ export default function PortalLayout({ management=false }) {
         [base+'/history', 'My appointments', History]
       ]
       
+  links.unshift(['/', 'Home', House])
   links.push([base+'/notifications', 'Updates', Bell], [base+'/profile', 'My profile', UserRound])
   const current = links.find(([path]) => path === location.pathname)?.[1] || 'Your account'
   
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-900 selection:bg-[#67c4c7]/30 pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+    <div className="min-h-screen flex bg-slate-50 text-slate-900 selection:bg-[#67c4c7]/30 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <a className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-slate-900" href="#main-content">Skip to content</a>
       
       {/* Sidebar Navigation */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-white/95 backdrop-blur-xl border-r border-slate-200/80 shadow-2xl lg:shadow-none flex flex-col transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-50 w-72 bg-white/95 backdrop-blur-xl border-r border-slate-200/80 flex-col">
         <div className="p-6 flex items-center justify-between border-b border-slate-100">
           <Brand stacked />
-          <button 
-            className="lg:hidden p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors" 
-            aria-label="Close navigation" 
-            onClick={() => setMenuAt(null)}
-          >
-            <X size={20} />
-          </button>
         </div>
         
         <div className="px-6 pt-6 pb-2">
@@ -60,8 +51,7 @@ export default function PortalLayout({ management=false }) {
             <NavLink 
               key={path} 
               to={path} 
-              end={path === base} 
-              onClick={() => setMenuAt(null)}
+              end={path === base || path === '/'} 
               className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all group relative ${
                 isActive 
                   ? 'bg-[#67c4c7]/15 text-[#67c4c7] shadow-2xs font-bold' 
@@ -99,20 +89,11 @@ export default function PortalLayout({ management=false }) {
         </div>
       </aside>
       
-      {open && <button className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden" aria-label="Close navigation" onClick={() => setMenuAt(null)}/>}
       
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-72">
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-2xs h-20 px-4 sm:px-8 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
-            <button 
-              className="lg:hidden p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors" 
-              aria-label="Open navigation" 
-              aria-expanded={open} 
-              onClick={() => setMenuAt(open ? null : location.pathname)}
-            >
-              <Menu size={20} />
-            </button>
             <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 truncate">
               <span className="uppercase tracking-wider text-[11px] font-bold text-slate-400">{management ? 'Clinic workspace' : 'My smile space'}</span>
               <span className="text-slate-300">/</span>
@@ -154,18 +135,7 @@ export default function PortalLayout({ management=false }) {
           <span className="font-medium text-slate-600">Your smile, in good hands.</span>
         </footer>
       </div>
-      {!open && <MobileBottomNav links={management ? [
-        {to:base,label:'Overview',icon:LayoutDashboard,end:true},
-        {to:base+'/schedule',label:'Visits',icon:CalendarDays},
-        {to:base+'/walk-ins',label:'Walk-in',icon:UserRound},
-        {to:base+'/reports',label:'Reports',icon:BarChart3},
-      ] : [
-        {to:base,label:'Home',icon:LayoutDashboard,end:true},
-        {to:base+'/book',label:'Book',icon:CalendarDays},
-        {to:base+'/history',label:'My visits',icon:History},
-        {to:base+'/notifications',label:'Updates',icon:Bell},
-      ]} onMore={()=>setMenuAt(location.pathname)}
-        moreActive={!(management ? [base,base+'/schedule',base+'/walk-ins',base+'/reports'] : [base,base+'/book',base+'/history',base+'/notifications']).includes(location.pathname)}/>}
+      <MobileBottomNav links={links.map(([to,label,icon])=>({to,label,icon,end:to===base || to==='/'}))} onSignOut={signOut}/>
     </div>
   )
 }
