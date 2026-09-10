@@ -18,7 +18,7 @@ export default function Home() {
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-4 lg:pt-10">
         <div className="lg:col-span-6 space-y-6 text-left lg:pr-8 xl:pr-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold tracking-wider uppercase border border-[#67c4c7]/20 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-[#67c4c7] animate-pulse" /> YOUR SMILE, IN GOOD HANDS
+            <span className="w-2 h-2 rounded-full bg-[#67c4c7] animate-pulse" /> Put your best self forward
           </div>
           
           <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">

@@ -81,7 +81,6 @@ export default function SiteFooter() {
         {/* Footer Bottom */}
         <div className="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-normal">
           <p>© {new Date().getFullYear()} Dentaprime - Dr. Karen Galagatan Dental Clinic.</p>
-          <span className="font-bold text-slate-400">Thoughtful care. Brighter everyday smiles.</span>
         </div>
       </div>
     </footer>
