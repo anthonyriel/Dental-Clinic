@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { LayoutDashboard, CalendarDays, History, UserRound, Bell, Stethoscope, Users, SlidersHorizontal, ArrowUpRight, LogOut, Menu, X, BarChart3 } from 'lucide-react'
 import Brand from '../components/Brand'
+import MobileBottomNav from '../components/MobileBottomNav'
 import { useAuth } from '../context/auth'
 
 export default function PortalLayout({ management=false }) {
@@ -32,7 +33,7 @@ export default function PortalLayout({ management=false }) {
   const current = links.find(([path]) => path === location.pathname)?.[1] || 'Your account'
   
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-900 selection:bg-[#67c4c7]/30">
+    <div className="min-h-screen flex bg-slate-50 text-slate-900 selection:bg-[#67c4c7]/30 pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <a className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-slate-900" href="#main-content">Skip to content</a>
       
       {/* Sidebar Navigation */}
@@ -153,6 +154,18 @@ export default function PortalLayout({ management=false }) {
           <span className="font-medium text-slate-600">Your smile, in good hands.</span>
         </footer>
       </div>
+      {!open && <MobileBottomNav links={management ? [
+        {to:base,label:'Overview',icon:LayoutDashboard,end:true},
+        {to:base+'/schedule',label:'Visits',icon:CalendarDays},
+        {to:base+'/walk-ins',label:'Walk-in',icon:UserRound},
+        {to:base+'/reports',label:'Reports',icon:BarChart3},
+      ] : [
+        {to:base,label:'Home',icon:LayoutDashboard,end:true},
+        {to:base+'/book',label:'Book',icon:CalendarDays},
+        {to:base+'/history',label:'My visits',icon:History},
+        {to:base+'/notifications',label:'Updates',icon:Bell},
+      ]} onMore={()=>setMenuAt(location.pathname)}
+        moreActive={!(management ? [base,base+'/schedule',base+'/walk-ins',base+'/reports'] : [base,base+'/book',base+'/history',base+'/notifications']).includes(location.pathname)}/>}
     </div>
   )
 }
