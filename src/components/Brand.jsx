@@ -15,12 +15,11 @@ export default function Brand({ compact = false, stacked = false }) {
           <span className="font-extrabold text-[#67c4c7] tracking-tight text-base sm:text-lg leading-none group-hover:text-slate-900 transition-colors">
             Dentaprime
           </span>
-          <span className={stacked ? "text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-1 leading-tight block font-mono" : "text-[10px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 font-mono"}>
-            {stacked ? (
-              <>DR. KAREN GALAGATAN<br />DENTAL CLINIC</>
-            ) : (
-              'DR. KAREN GALAGATAN DENTAL CLINIC'
-            )}
+          <span className={stacked ? "text-[11px] sm:text-[12px] font-bold text-slate-500 tracking-wider mt-1 leading-tight block font-mono" : "text-[11px] sm:text-[12px] font-bold text-slate-500 tracking-wider mt-0.5 leading-tight block font-mono"}>
+            DENTAL CLINIC<br />
+            <span className="font-sans font-medium tracking-normal text-[10px] sm:text-[11px] text-slate-500 block mt-0.5">
+              Dr. Karen Galagatan
+            </span>
           </span>
         </div>
       )}
