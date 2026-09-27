@@ -15,12 +15,16 @@ export default function UserManagement() {
   const { data: users, loading, error: loadError, refresh: fetchUsers } = useQuery(loadUsers, [])
   const [busy, setBusy] = useState(false)
   const [search, setSearch] = useState('')
+  const [accountFilter, setAccountFilter] = useState('active')
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
+  const [message, setMessage] = useState('')
   const [page, setPage] = useState(0)
-  
+
   const canManage = (account) => account.id !== currentUser.id && (role === 'owner' || !['admin','owner'].includes(account.role))
-  const filtered = users.filter(account => ((account.full_name || '') + ' ' + (account.username || '') + ' ' + (account.phone || '')).toLowerCase().includes(search.toLowerCase()))
+  const filtered = users.filter(account => (accountFilter === 'all' || (accountFilter === 'inactive' ? account.is_active === false : account.is_active !== false)) && ((account.full_name || '') + ' ' + (account.username || '') + ' ' + (account.phone || '')).toLowerCase().includes(search.toLowerCase()))
   const pageIndex = Math.min(page, Math.max(0, Math.ceil(filtered.length / 20) - 1))
-  
+
   const [selectedUser, setSelectedUser] = useState(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [error, setError] = useState('')
@@ -114,48 +118,72 @@ export default function UserManagement() {
     catch (err) { setError(err.message) } finally { setBusy(false) }
   }
 
+  const permanentlyDelete = async (e) => {
+    e.preventDefault()
+    if (busy || !deleteTarget || deleteConfirmation !== 'DELETE') return
+    setBusy(true); setError(''); setMessage('')
+    try {
+      const response = await supabase.functions.invoke('delete-account', { body: { user_id: deleteTarget.id, confirmation: 'DELETE' } })
+      if (response.error) {
+        if (response.error.name === 'FunctionsFetchError') {
+          throw new Error('Cannot reach the account deletion service. Check that delete-account is deployed in Supabase and allows this site address. Refresh the account list before trying again.')
+        }
+        let detail
+        try { detail = await response.error.context?.json() } catch { /* keep the original error */ }
+        throw new Error(detail?.error || response.error.message)
+      }
+      if (response.data?.error) throw new Error(response.data.error)
+      setMessage('Account and client history permanently deleted.')
+      setDeleteTarget(null); setDeleteConfirmation('')
+    } catch (err) { setError(err.message) }
+    finally { setBusy(false); fetchUsers() }
+  }
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12 text-left">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
+          <span className="text-xs font-bold tracking-wider text-sky-600 uppercase">CLINIC WORKSPACE</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">User Management</h1>
           <p className="text-sm text-slate-600 mt-1 font-normal">View registered accounts, edit profiles, assign roles, and manage users.</p>
         </div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
-          <ShieldCheck className="w-4 h-4 text-[#67c4c7]" /> Admin Access
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-sky-600 rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
+          <ShieldCheck className="w-4 h-4 text-sky-600" /> Admin Access
         </div>
       </div>
 
-      <Feedback error={error || loadError} onRetry={() => { setError(''); fetchUsers() }} />
-      
+      <Feedback error={error || loadError} message={message} onRetry={() => { setError(''); fetchUsers() }} />
+      <div className="flex flex-wrap gap-2" aria-label="Filter account status">
+        { [['active','Active'],['inactive','Deactivated'],['all','All accounts']].map(([value,label]) => <button key={value} type="button" aria-pressed={accountFilter === value} onClick={() => {setAccountFilter(value);setPage(0)}} className={`btn ${accountFilter === value ? 'btn-primary' : 'btn-secondary'}`}>{label}</button>) }
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
-          <input 
-            aria-label="Search users" 
-            placeholder="Search name, username or phone" 
-            value={search} 
-            onChange={e => { setSearch(e.target.value); setPage(0) }} 
-            className="w-full pl-10 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none transition text-slate-900 bg-white shadow-sm" 
+          <input
+            aria-label="Search users"
+            placeholder="Search name, username or phone"
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0) }}
+            className="w-full pl-10 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none transition text-slate-900 bg-white shadow-sm"
           />
         </div>
-        
+
         <div className="flex items-center gap-4 text-sm font-medium text-slate-600">
-          <button 
-            disabled={pageIndex === 0} 
+          <button
+            disabled={pageIndex === 0}
             onClick={() => setPage(pageIndex - 1)}
-            className="disabled:opacity-40 hover:text-[#67c4c7] transition font-bold"
+            className="disabled:opacity-40 hover:text-sky-600 transition font-bold"
           >
             Previous
           </button>
           <span className="bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-xs shadow-2xs font-mono">
             {filtered.length} users · Page {pageIndex + 1}
           </span>
-          <button 
-            disabled={(pageIndex + 1) * 20 >= filtered.length} 
+          <button
+            disabled={(pageIndex + 1) * 20 >= filtered.length}
             onClick={() => setPage(pageIndex + 1)}
-            className="disabled:opacity-40 hover:text-[#67c4c7] transition font-bold"
+            className="disabled:opacity-40 hover:text-sky-600 transition font-bold"
           >
             Next
           </button>
@@ -175,10 +203,10 @@ export default function UserManagement() {
                     <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                       u.role === 'owner' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
                       u.role === 'admin' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' :
-                      u.role === 'staff' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 
+                      u.role === 'staff' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
                       'bg-slate-100 text-slate-700 border border-slate-200'
                     }`}>
-                      {u.role}{u.is_active === false ? ' · Inactive' : ''}
+                      {u.role}{u.deletion_pending ? ' · Deletion pending' : u.is_active === false ? ' · Inactive' : ''}
                     </span>
                   </div>
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-500 font-normal">
@@ -192,7 +220,7 @@ export default function UserManagement() {
                   <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">Role:</label>
                     <select
-                      disabled={busy || !canManage(u)}
+                      disabled={busy || !canManage(u) || u.deletion_pending}
                       value={u.role}
                       onChange={(e) => handleRoleChange(u.id, e.target.value)}
                       className="text-xs sm:text-sm border-none bg-transparent focus:ring-0 outline-none font-bold text-slate-700 cursor-pointer disabled:cursor-not-allowed"
@@ -205,22 +233,23 @@ export default function UserManagement() {
                   </div>
 
                   <button
-                    disabled={busy || !canManage(u)}
+                    disabled={busy || !canManage(u) || u.deletion_pending}
                     onClick={() => openEditModal(u)}
-                    className="p-2.5 bg-white border border-slate-200 hover:bg-[#67c4c7]/10 hover:text-[#67c4c7] hover:border-[#67c4c7]/30 text-slate-600 rounded-xl transition shadow-2xs disabled:opacity-50"
+                    className="p-2.5 bg-white border border-slate-200 hover:bg-[#67c4c7]/10 hover:text-sky-600 hover:border-[#67c4c7]/30 text-slate-600 rounded-xl transition shadow-2xs disabled:opacity-50"
                     title="Edit User Profile"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
 
                   <button
-                    disabled={busy || !canManage(u)}
+                    disabled={busy || !canManage(u) || u.deletion_pending}
                     onClick={() => handleToggleUser(u)}
                     className="px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 text-xs font-bold rounded-xl transition shadow-2xs disabled:opacity-50"
                     title="Change account access"
                   >
-                    {u.is_active === false ? 'Reactivate' : 'Deactivate'}
+                    {u.is_active === false ? 'Restore account' : 'Deactivate'}
                   </button>
+                  {u.is_active === false && canManage(u) && <button disabled={busy} onClick={() => {setDeleteTarget(u);setDeleteConfirmation('');setError('')}} className="btn bg-red-50 text-red-700 border border-red-200 hover:bg-red-100">{u.deletion_pending ? 'Retry permanent deletion' : 'Permanently delete'}</button>}
                 </div>
               </div>
             ))}
@@ -229,16 +258,27 @@ export default function UserManagement() {
       )}
 
       {/* Edit User Modal */}
+      {deleteTarget && <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm p-4 flex items-center justify-center">
+        <form onSubmit={permanentlyDelete} role="dialog" aria-modal="true" aria-labelledby="delete-account-title" className="glass-panel bg-white max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+          <h2 id="delete-account-title" className="text-xl font-bold">Permanently delete {deleteTarget.full_name || 'this account'}?</h2>
+          <p className="text-sm text-slate-600">This removes their login, profile photos, client record, appointments, service payments and appointment history. Reports will change. This cannot be restored.</p>
+          <p className="text-sm text-slate-600">Once deletion starts, restoring the account is disabled. If interrupted, retry deletion.</p>
+          <p className="text-xs text-slate-500 break-all">Account ID: {deleteTarget.id}</p>
+          <Feedback error={error}/>
+          <label className="block text-sm font-semibold">Type DELETE to confirm<input autoFocus disabled={busy} value={deleteConfirmation} onChange={e => setDeleteConfirmation(e.target.value)} className="block w-full mt-2 min-h-11 p-3 border border-slate-300 rounded-xl" autoComplete="off"/></label>
+          <div className="flex flex-wrap gap-3"><button type="button" disabled={busy} className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>Cancel</button><button disabled={busy || deleteConfirmation !== 'DELETE'} className="btn bg-red-700 text-white hover:bg-red-800">{busy ? 'Deleting…' : 'Permanently delete'}</button></div>
+        </form>
+      </div>}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto overflow-x-hidden text-left">
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div>
-                <span className="text-[10px] font-bold tracking-wider text-[#67c4c7] uppercase">PROFILE MANAGEMENT</span>
+                <span className="text-[10px] font-bold tracking-wider text-sky-600 uppercase">PROFILE MANAGEMENT</span>
                 <h3 className="text-xl font-extrabold text-slate-900 mt-1">Edit User Profile</h3>
               </div>
-              <button 
-                onClick={() => setIsEditModalOpen(false)} 
+              <button
+                onClick={() => setIsEditModalOpen(false)}
                 className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -343,7 +383,7 @@ export default function UserManagement() {
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Address Information</h4>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Region</label>
@@ -417,7 +457,7 @@ export default function UserManagement() {
                 <button
                   disabled={busy}
                   type="submit"
-                  className="flex-1 px-5 py-3 bg-[#67c4c7] hover:bg-[#57b3b6] text-white text-sm font-bold rounded-xl transition shadow-md disabled:opacity-50"
+                  className="flex-1 px-5 py-3 bg-[#67c4c7] hover:bg-[#57b3b6] text-slate-900 text-sm font-bold rounded-xl transition shadow-md disabled:opacity-50"
                 >
                   {busy ? 'Saving...' : 'Save Changes'}
                 </button>

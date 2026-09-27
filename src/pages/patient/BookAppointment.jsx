@@ -11,6 +11,7 @@ import ServiceCard from '../../components/ServiceCard'
 import SlotPicker from '../../components/SlotPicker'
 import Feedback from '../../components/Feedback'
 import { formatMobile, normalizeMobile } from '../../lib/phone'
+import { bookingRequestRejected } from '../../lib/errors'
 
 const stepNames = ['Your care', 'Your time', 'Your details', 'Review']
 
@@ -29,32 +30,34 @@ export default function BookAppointment() {
   const [success, setSuccess] = useState(false)
   const heading = useRef(null)
   const inFlight = useRef(false)
-  
+  const request = useRef(null)
+  const [uncertain, setUncertain] = useState(false)
+
   const selectedServices = serviceIds.map(id => services.data.find(s => String(s.id) === id && s.is_active !== false)).filter(Boolean)
   const totalDuration = selectedServices.reduce((acc, s) => acc + (s.duration_minutes || 60), 0)
   const totalPrice = selectedServices.some(s => s.price == null) ? null : selectedServices.reduce((acc, s) => acc + Number(s.price), 0)
-  
+
   useEffect(() => { heading.current?.focus() }, [step, success])
-  
+
   function toggleService(id) {
     const strId = String(id)
-    setServiceIds(current => 
-      current.includes(strId) 
-        ? current.filter(item => item !== strId) 
+    setServiceIds(current =>
+      current.includes(strId)
+        ? current.filter(item => item !== strId)
         : [...current, strId]
     )
     setSlot(null)
-    setError('') 
+    setError('')
   }
 
   function handlePhoneChange(e) {
     setDetails({...details, phone: e.target.value})
   }
-  
+
   async function submit(e) {
     e.preventDefault()
     setError('')
-    if (!selectedServices.length || selectedServices.length !== serviceIds.length) {
+    if (!request.current && (!selectedServices.length || selectedServices.length !== serviceIds.length)) {
       setError('Choose available services before continuing.'); setStep(0); return
     }
     const cleanPhone = normalizeMobile(details.phone)
@@ -67,34 +70,42 @@ export default function BookAppointment() {
     if (step < 3) {
       if (serviceIds.length === 0) { setStep(0); return }
       if (step === 1 && !slot) return
-      if (step === 2 && (!details.full_name.trim() || !cleanPhone)) { 
+      if (step === 2 && (!details.full_name.trim() || !cleanPhone)) {
         setError('Please enter your name and contact number.')
-        return 
+        return
       }
       setStep(step + 1)
       return
     }
-    if (inFlight.current || serviceIds.length === 0 || !slot || !settings.data) return
+    if (inFlight.current || (!request.current && (serviceIds.length === 0 || !slot || !settings.data))) return
     inFlight.current = true
     setBusy(true)
     try {
-      if (details.full_name.trim() !== profile.full_name || cleanPhone !== profile.phone) {
+      if (!request.current && (details.full_name.trim() !== profile.full_name || cleanPhone !== profile.phone)) {
         await updateOne('profiles', user.id, { full_name: details.full_name.trim(), phone: cleanPhone })
         refreshProfile()
       }
-      await result(supabase.rpc('book_appointment', { 
-        p_service_ids: serviceIds, 
-        p_date: slot.appointment_date, 
-        p_time_slot: slot.time_slot 
-      }))
+      request.current ||= {
+        p_service_ids: serviceIds,
+        p_date: slot.appointment_date,
+        p_time_slot: slot.time_slot,
+        p_request_id: crypto.randomUUID(),
+      }
+      await result(supabase.rpc('book_patient_appointment', request.current))
       setSuccess(true)
-    } catch (err) { 
+    } catch (err) {
       setError(errorMessage(err))
-      setSlot(null)
-      setStep(1) 
-    } finally { 
+      if (request.current && !bookingRequestRejected(err)) {
+        setUncertain(true)
+      } else {
+        request.current = null
+        setUncertain(false)
+        setSlot(null)
+        setStep(1)
+      }
+    } finally {
       setBusy(false)
-      inFlight.current = false 
+      inFlight.current = false
     }
   }
 
@@ -102,13 +113,13 @@ export default function BookAppointment() {
     <div className="space-y-8 max-w-6xl mx-auto pb-12 text-left">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">MAKE TIME FOR YOUR SMILE</span>
+          <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">MAKE TIME FOR YOUR SMILE</span>
           <h1 tabIndex={-1} ref={heading} className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
             {success ? 'You’re one step closer.' : 'Let’s plan your visit.'}
           </h1>
           <p className="text-sm sm:text-base text-slate-600 mt-1 font-normal">A little time for yourself. A good reason to smile.</p>
         </div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#226c72] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
           <ShieldCheck size={16}/> Your personal smile space
         </div>
       </div>
@@ -140,7 +151,7 @@ export default function BookAppointment() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Link className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md transition-all inline-flex items-center justify-center gap-2" to="/dashboard/history">
+            <Link className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold text-sm shadow-md transition-all inline-flex items-center justify-center gap-2" to="/dashboard/history">
               View my appointments <ArrowRight size={18}/>
             </Link>
             <Link className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all" to="/dashboard">
@@ -170,11 +181,12 @@ export default function BookAppointment() {
           </ol>
 
           <Feedback error={error || services.error || settings.error} onRetry={() => { setError(''); services.refresh(); settings.refresh() }}/>
+          {uncertain && <p role="status" className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm">The booking result could not be confirmed. Retry this same request to avoid booking twice. If you leave this page, check My appointments before making another booking.</p>}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <form onSubmit={submit} className="lg:col-span-8 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8">
               <div className="space-y-1 border-b border-slate-100 pb-4">
-                <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">STEP {String(step + 1).padStart(2, '0')} OF 04</span>
+                <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">STEP {String(step + 1).padStart(2, '0')} OF 04</span>
                 <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
                   {['What brings you in?', 'Find your perfect moment.', 'A little about you.', 'Looking good. Let’s review.'][step]}
                 </h2>
@@ -197,10 +209,10 @@ export default function BookAppointment() {
                         ))}
                       </div>
                       <div>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           onClick={() => setSelectingMore(true)}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#67c4c7]/10 hover:bg-[#67c4c7]/20 text-[#67c4c7] text-xs font-bold transition"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#67c4c7]/10 hover:bg-[#67c4c7]/20 text-[#226c72] text-xs font-bold transition"
                         >
                           <Plus size={15}/> Add another service to this booking
                         </button>
@@ -211,7 +223,7 @@ export default function BookAppointment() {
                       {selectingMore && (
                         <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
                           <span className="text-xs font-bold text-slate-700">Select additional services:</span>
-                          <button type="button" onClick={() => setSelectingMore(false)} className="text-xs font-bold text-[#67c4c7] hover:underline">Done selecting</button>
+                          <button type="button" onClick={() => setSelectingMore(false)} className="text-xs font-bold text-[#226c72] hover:underline">Done selecting</button>
                         </div>
                       )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -226,7 +238,7 @@ export default function BookAppointment() {
                   )}
                   {!services.loading && !services.error && !services.data.some(s => s.is_active !== false) && (
                     <p className="text-sm text-slate-600 bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center">
-                      Online services are not currently available. <Link to="/contact" className="text-[#67c4c7] font-bold underline">Contact the clinic.</Link>
+                      Online services are not currently available. <Link to="/contact" className="text-[#226c72] font-bold underline">Contact the clinic.</Link>
                     </p>
                   )}
                 </>
@@ -242,11 +254,11 @@ export default function BookAppointment() {
                 <div className="space-y-5">
                   <div className="space-y-1.5">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">Full Name <span className="text-red-500">*</span></label>
-                    <input 
-                      autoComplete="name" 
-                      required 
-                      maxLength={120} 
-                      value={details.full_name} 
+                    <input
+                      autoComplete="name"
+                      required
+                      maxLength={120}
+                      value={details.full_name}
                       onChange={e => setDetails({...details, full_name: e.target.value})}
                       className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                       placeholder="Juan Dela Cruz"
@@ -255,12 +267,12 @@ export default function BookAppointment() {
 
                   <div className="space-y-1.5">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">Phone Number <span className="text-red-500">*</span></label>
-                    <input 
-                      type="tel" 
-                      autoComplete="tel" 
-                      required 
-                      placeholder="0912 345 6789" 
-                      value={details.phone} 
+                    <input
+                      type="tel"
+                      autoComplete="tel"
+                      required
+                      placeholder="0912 345 6789"
+                      value={details.phone}
                       onChange={handlePhoneChange}
                       onBlur={() => setDetails(current => ({ ...current, phone: formatMobile(current.phone) }))}
                       className="w-full px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
@@ -270,10 +282,10 @@ export default function BookAppointment() {
 
                   <div className="space-y-1.5">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">Email Address</label>
-                    <input 
-                      type="email" 
-                      value={user.email || ''} 
-                      readOnly 
+                    <input
+                      type="email"
+                      value={user.email || ''}
+                      readOnly
                       className="w-full px-4 py-2.5 text-sm font-normal border border-slate-200 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed font-mono"
                     />
                     <span className="text-xs text-slate-400 block pt-1">Your account email. Your name and phone will be saved to your profile when you book.</span>
@@ -284,7 +296,7 @@ export default function BookAppointment() {
               {step === 3 && (
                 <div className="space-y-4">
                   <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                    <div className="p-2.5 rounded-xl bg-[#67c4c7]/10 text-[#67c4c7] shrink-0"><UserRound size={20}/></div>
+                    <div className="p-2.5 rounded-xl bg-[#67c4c7]/10 text-[#226c72] shrink-0"><UserRound size={20}/></div>
                     <div className="space-y-0.5">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Patient</span>
                       <strong className="text-base font-bold text-slate-900 block">{details.full_name}</strong>
@@ -293,7 +305,7 @@ export default function BookAppointment() {
                   </div>
 
                   <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                    <div className="p-2.5 rounded-xl bg-[#67c4c7]/10 text-[#67c4c7] shrink-0"><Heart size={20}/></div>
+                    <div className="p-2.5 rounded-xl bg-[#67c4c7]/10 text-[#226c72] shrink-0"><Heart size={20}/></div>
                     <div className="space-y-1 flex-1">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Selected Services Breakdown</span>
                       <div className="space-y-1.5 pt-1">
@@ -308,7 +320,7 @@ export default function BookAppointment() {
                   </div>
 
                   <div className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                    <div className="p-2.5 rounded-xl bg-[#67c4c7]/10 text-[#67c4c7] shrink-0"><CalendarDays size={20}/></div>
+                    <div className="p-2.5 rounded-xl bg-[#67c4c7]/10 text-[#226c72] shrink-0"><CalendarDays size={20}/></div>
                     <div className="space-y-0.5">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Your Visit</span>
                       <strong className="text-base font-bold text-slate-900 block">{visitDateLabel(slot?.appointment_date)}</strong>
@@ -327,27 +339,27 @@ export default function BookAppointment() {
 
               <div className="flex items-center justify-between pt-6 border-t border-slate-100">
                 {step > 0 ? (
-                  <button type="button" disabled={busy} className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold transition inline-flex items-center gap-1.5" onClick={() => setStep(step - 1)}>
+                  <button type="button" disabled={busy || uncertain} className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold transition inline-flex items-center gap-1.5" onClick={() => setStep(step - 1)}>
                     <ArrowLeft size={16}/> Back
                   </button>
                 ) : (
                   <Link className="text-sm font-bold text-slate-500 hover:text-slate-700" to="/dashboard">Cancel</Link>
                 )}
-                
-                <button 
-                  type="submit" 
-                  className="px-6 py-3 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md transition-all inline-flex items-center gap-2 disabled:opacity-50" 
-                  disabled={busy || serviceIds.length === 0 || !!services.error || !!settings.error || !settings.data || (step === 1 && !slot)}
+
+                <button
+                  type="submit"
+                  className="px-6 py-3 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold text-sm shadow-md transition-all inline-flex items-center gap-2 disabled:opacity-50"
+                  disabled={busy || (!uncertain && (serviceIds.length === 0 || !!services.error || !!settings.error || !settings.data || (step === 1 && !slot)))}
                 >
-                  {busy ? 'Sending request…' : step === 3 ? 'Request my appointments' : 'Continue'} <ArrowRight size={17}/>
+                  {busy ? 'Sending request…' : uncertain ? 'Retry same booking' : step === 3 ? 'Request my appointment' : 'Continue'} <ArrowRight size={17}/>
                 </button>
               </div>
             </form>
 
             <aside className="lg:col-span-4 space-y-6">
               <div className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-6">
-                <span className="text-[10px] font-extrabold tracking-widest text-[#67c4c7] uppercase">YOUR VISIT AT A GLANCE</span>
-                <div className="w-14 h-14 rounded-2xl bg-[#67c4c7]/10 text-[#67c4c7] flex items-center justify-center border border-[#67c4c7]/20">
+                <span className="text-[10px] font-extrabold tracking-widest text-[#226c72] uppercase">YOUR VISIT AT A GLANCE</span>
+                <div className="w-14 h-14 rounded-2xl bg-[#67c4c7]/10 text-[#226c72] flex items-center justify-center border border-[#67c4c7]/20">
                   <Heart size={28} strokeWidth={1.5}/>
                 </div>
                 <div className="space-y-1">
@@ -358,13 +370,13 @@ export default function BookAppointment() {
                     {selectedServices.length > 0 ? selectedServices.map(s => s.name).join(', ') : 'Your appointment details will appear here as you make your selections.'}
                   </p>
                 </div>
-                
+
                 <dl className="space-y-3 pt-4 border-t border-slate-100 text-xs">
                   <div className="flex items-center justify-between"><dt className="flex items-center gap-1.5 text-slate-500 font-semibold"><Clock size={15} className="text-slate-400"/> Total Duration</dt><dd className="font-bold text-slate-900">{selectedServices.length > 0 ? totalDuration + ' minutes' : '—'}</dd></div>
                   <div className="flex items-center justify-between"><dt className="flex items-center gap-1.5 text-slate-500 font-semibold"><CalendarDays size={15} className="text-slate-400"/> Date</dt><dd className="font-bold text-slate-900">{slot ? visitDateLabel(slot.appointment_date) : 'Not selected'}</dd></div>
                   {slot && <div className="flex items-center justify-between"><dt className="text-slate-500 font-semibold">Time</dt><dd className="font-bold text-slate-900">{slot.time_slot}</dd></div>}
                 </dl>
-                
+
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total estimate</span>
                   <strong className="text-lg font-extrabold text-slate-900 font-mono">{selectedServices.length > 0 ? priceLabel(totalPrice) : '—'}</strong>

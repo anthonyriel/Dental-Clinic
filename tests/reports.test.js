@@ -2,6 +2,17 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { buildReport, serviceReportCsv } from '../src/lib/reports.js'
 
+test('booking sources survive account linking and distinguish offline calls from walk-ins', () => {
+  const report = buildReport([
+    {id:'a',patient_id:'linked',booking_source:'walk_in',appointment_date:'2030-01-01'},
+    {id:'b',patient_id:null,booking_source:'call',appointment_date:'2030-01-01'},
+    {id:'c',patient_id:null,booking_source:'text',appointment_date:'2030-01-01'},
+  ],[])
+  assert.equal(report.walkIns,1)
+  assert.equal(report.registered,1)
+  assert.equal(report.visits,3)
+})
+
 test('reports sum actual service payments, count visits separately, and group renamed services', () => {
   const report = buildReport([
     {id:'a',patient_id:'patient',appointment_date:'2030-02-10',completed_at:'2030-01-31T16:30:00Z',price:'100.30',appointment_services:[

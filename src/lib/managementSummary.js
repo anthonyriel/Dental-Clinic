@@ -1,7 +1,7 @@
 // Fetch six preview rows and server-side totals, never the entire history.
 export async function managementSummary(client, date) {
   const responses = await Promise.all([
-    client.from('appointments').select('*, services(name, price), profiles(full_name, phone)', { count: 'exact' })
+    client.from('appointments').select('*, services(name, price), profiles(full_name, phone), client_records(full_name,phone)', { count: 'exact' })
       .eq('appointment_date', date).not('status', 'in', '(cancelled,no_show)')
       .order('starts_at').order('id').limit(6),
     client.from('appointments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),

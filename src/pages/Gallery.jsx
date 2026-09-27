@@ -23,9 +23,9 @@ export default function Gallery() {
   return (
     <div className="space-y-12 pb-12">
       <div className="text-left space-y-2 max-w-2xl">
-        <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">A SPACE TO FEEL AT EASE</span>
+        <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">A SPACE TO FEEL AT EASE</span>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-          Get to know<br/>your <span className="italic font-serif text-[#67c4c7]">smile space.</span>
+          Get to know<br/>your <span className="italic font-serif text-[#226c72]">smile space.</span>
         </h1>
         <p className="text-base text-slate-600 font-normal">A look inside Dentaprime. We look forward to welcoming you in person.</p>
       </div>
@@ -34,12 +34,12 @@ export default function Gallery() {
         {categories.map(([value, label]) => {
           const isSelected = category === value
           return (
-            <button 
-              key={value} 
-              aria-pressed={isSelected} 
+            <button
+              key={value}
+              aria-pressed={isSelected}
               className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all shadow-2xs ${
-                isSelected 
-                  ? 'bg-[#67c4c7] text-white shadow-md font-bold' 
+                isSelected
+                  ? 'bg-[#67c4c7] text-[#153438] shadow-md font-bold'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
               onClick={() => setCategory(value)}
@@ -63,16 +63,16 @@ export default function Gallery() {
           {items.map(item => (
             <figure key={item.id} className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all group text-left flex flex-col justify-between">
               <div className="aspect-video w-full overflow-hidden bg-slate-100">
-                <img 
-                  loading="lazy" 
-                  src={item.image_url} 
-                  alt={item.title || 'Dentaprime clinic'} 
+                <img
+                  loading="lazy"
+                  src={item.image_url}
+                  alt={item.title || 'Dentaprime clinic'}
                   onError={e => { e.currentTarget.style.display = 'none' }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <figcaption className="p-6 space-y-1">
-                <span className="text-[10px] font-extrabold tracking-widest text-[#67c4c7] uppercase">
+                <span className="text-[10px] font-extrabold tracking-widest text-[#226c72] uppercase">
                   {item.category?.replaceAll('_', ' ') || 'OUR CLINIC'}
                 </span>
                 <h2 className="text-lg font-bold text-slate-900">{item.title || 'Inside Dentaprime'}</h2>

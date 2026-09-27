@@ -34,22 +34,22 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-6 lg:p-8 selection:bg-[#67c4c7]/30">
+    <div className="auth-page flex items-center justify-center p-4 sm:p-6 lg:p-8 selection:bg-[#67c4c7]/30">
       <div className="max-w-5xl w-full bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-        
+
         {/* Left Story / Branding Section */}
-        <div className="lg:col-span-5 bg-slate-900 text-white p-8 sm:p-12 flex flex-col justify-between space-y-8 relative overflow-hidden">
+        <div className="lg:col-span-5 bg-slate-900 text-white p-6 lg:p-12 flex flex-col justify-between space-y-4 lg:space-y-8 relative overflow-hidden">
           <div className="space-y-4 relative z-10 text-left">
             <span className="text-[10px] font-bold tracking-widest text-[#67c4c7] uppercase">WELCOME TO YOUR SMILE SPACE</span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-              Good to<br />see you <span className="italic font-serif text-[#67c4c7]">again.</span>
+            <h1 className="text-2xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+              Good to <br className="hidden lg:block" />see you <span className="italic font-serif text-[#67c4c7]">again.</span>
             </h1>
             <p className="text-slate-300 text-sm font-normal leading-relaxed">
               Your next visit, your appointment updates, and a little peace of mind. Sign in to make time for your smile.
             </p>
           </div>
-          
-          <div className="flex items-center gap-3 relative z-10 text-xs font-semibold text-slate-300 bg-slate-800/80 border border-slate-700/80 p-4 rounded-2xl">
+
+          <div className="hidden lg:flex items-center gap-3 relative z-10 text-xs font-semibold text-slate-300 bg-slate-800/80 border border-slate-700/80 p-4 rounded-2xl">
             <div className="w-9 h-9 rounded-xl bg-[#67c4c7]/20 text-[#67c4c7] flex items-center justify-center shrink-0 border border-[#67c4c7]/30">
               <Heart size={18} strokeWidth={1.8}/>
             </div>
@@ -58,7 +58,7 @@ export default function Login() {
         </div>
 
         {/* Right Form Section */}
-        <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-center space-y-6">
+        <div className="lg:col-span-7 p-6 sm:p-12 flex flex-col justify-center space-y-6">
           <div className="text-left space-y-1">
             <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Welcome Back</h2>
             <p className="text-sm text-slate-500 font-normal">Sign in to manage your appointments</p>
@@ -90,7 +90,7 @@ export default function Login() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide">Password</label>
-                <Link to="/forgot-password" className="text-xs font-bold text-[#67c4c7] hover:underline">Forgot password?</Link>
+                <Link to="/forgot-password" className="text-xs font-bold text-[#226c72] hover:underline">Forgot password?</Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
@@ -108,7 +108,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold rounded-xl transition shadow-md disabled:opacity-50 text-sm"
+              className="w-full py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold rounded-xl transition shadow-md disabled:opacity-50 text-sm"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -116,7 +116,7 @@ export default function Login() {
 
           <p className="text-center text-sm text-slate-500 font-normal pt-2">
             Don't have an account?{' '}
-            <Link to={next ? `/signup?next=${encodeURIComponent(next)}` : '/signup'} className="text-[#67c4c7] font-bold hover:underline">
+            <Link to={next ? `/signup?next=${encodeURIComponent(next)}` : '/signup'} className="text-[#226c72] font-bold hover:underline">
               Sign up
             </Link>
           </p>

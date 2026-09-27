@@ -8,17 +8,18 @@ import { CalendarDays, Clock, RefreshCw, AlertCircle } from 'lucide-react'
 import AvailabilityCalendar from './AvailabilityCalendar'
 import { visitDateLabel } from '../lib/presentation'
 
-export default function SlotPicker({ serviceId, serviceIds, excludeId = null, value, onChange, duration, calendarSettings, walkIn = false }) {
+export default function SlotPicker({ serviceId, serviceIds, excludeId = null, value, onChange, duration, calendarSettings, walkIn = false, staffSource = null }) {
   const [date, setDate] = useState(value?.appointment_date || (walkIn ? clinicDate() : ''))
-  
+
   const servicesKey = JSON.stringify(serviceIds || (serviceId ? [String(serviceId)] : []))
   const loader = useCallback(async () => {
     if (!date || (!JSON.parse(servicesKey).length && !excludeId)) return []
+    if (staffSource) return result(supabase.rpc('available_staff_slots', { p_date: date, p_service_ids: JSON.parse(servicesKey), p_source: staffSource }))
     return result(supabase.rpc(walkIn ? 'available_walk_in_slots' : 'available_service_slots', { p_date: date, ...(walkIn ? { p_service_id: String(serviceId) } : { p_service_ids: JSON.parse(servicesKey) }), p_exclude_id: excludeId ? String(excludeId) : null }))
-  }, [date, serviceId, servicesKey, excludeId, walkIn])
+  }, [date, serviceId, servicesKey, excludeId, walkIn, staffSource])
 
   const { data: slots, error, loading, refresh } = useQuery(loader, [], date ? 10000 : 0)
-  
+
   // The availability RPC excludes every reservation overlapping the full visit.
   // Never render retained results from a failed request as available times.
   const filteredSlots = error || loading ? [] : (slots || []).filter(slot => slot.appointment_date === date)
@@ -31,11 +32,11 @@ export default function SlotPicker({ serviceId, serviceIds, excludeId = null, va
   return (
     <div className="space-y-6 text-left">
       {calendarSettings ? (
-        <AvailabilityCalendar 
+        <AvailabilityCalendar
           serviceIds={JSON.parse(servicesKey)}
-          excludeId={excludeId} 
-          settings={calendarSettings} 
-          date={date} 
+          excludeId={excludeId}
+          settings={calendarSettings}
+          date={date}
           onSelect={day => { setDate(day); onChange(null); refresh() }}
         />
       ) : (
@@ -45,14 +46,14 @@ export default function SlotPicker({ serviceId, serviceIds, excludeId = null, va
           </label>
           <div className="relative">
             <CalendarDays className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
-            <input 
-              type="date" 
+            <input
+              type="date"
               min={clinicDate()}
               max={walkIn ? clinicDate() : undefined}
-              required 
-              value={date} 
-              onChange={e => { setDate(e.target.value); onChange(null) }} 
-              className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
+              required
+              value={date}
+              onChange={e => { setDate(e.target.value); onChange(null) }}
+              className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
             />
           </div>
         </div>
@@ -90,14 +91,14 @@ export default function SlotPicker({ serviceId, serviceIds, excludeId = null, va
               const displayRange = slot.time_slot
               const isSelected = value?.time_slot === displayRange && value?.appointment_date === date
               return (
-                <button 
-                  key={slot.time_slot} 
-                  type="button" 
-                  aria-pressed={isSelected} 
-                  onClick={() => onChange(slot)} 
+                <button
+                  key={slot.time_slot}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => onChange(slot)}
                   className={`py-3 px-4 rounded-xl text-xs font-bold transition-all border font-mono shadow-2xs ${
-                    isSelected 
-                      ? 'bg-[#67c4c7] text-white border-[#67c4c7] shadow-md ring-2 ring-[#67c4c7]/30' 
+                    isSelected
+                      ? 'bg-[#67c4c7] text-white border-[#67c4c7] shadow-md ring-2 ring-[#67c4c7]/30'
                       : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
                   }`}
                 >
@@ -125,9 +126,9 @@ export default function SlotPicker({ serviceId, serviceIds, excludeId = null, va
       <input aria-label="Available appointment time" className="sr-only" tabIndex={-1} required value={valid ? value?.time_slot || '' : ''} onChange={() => {}} />
 
       <div className="pt-2">
-        <button 
-          type="button" 
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#67c4c7] hover:underline" 
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#67c4c7] hover:underline"
           onClick={refresh}
         >
           <RefreshCw size={14}/> Refresh availability

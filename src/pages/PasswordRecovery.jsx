@@ -31,11 +31,11 @@ export default function PasswordRecovery({ reset = false }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-6 lg:p-8 selection:bg-[#67c4c7]/30">
-      <div className="max-w-md w-full bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-8 sm:p-10 shadow-xl space-y-6 text-left">
-        
+    <div className="auth-page flex items-center justify-center p-4 sm:p-6 lg:p-8 selection:bg-[#67c4c7]/30">
+      <div className="max-w-md w-full bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-5 sm:p-10 shadow-xl space-y-6 text-left">
+
         <div className="space-y-1">
-          <div className="w-10 h-10 rounded-2xl bg-[#67c4c7]/10 text-[#67c4c7] flex items-center justify-center border border-[#67c4c7]/20 mb-4">
+          <div className="w-10 h-10 rounded-2xl bg-[#67c4c7]/10 text-[#226c72] flex items-center justify-center border border-[#67c4c7]/20 mb-4">
             <KeyRound size={20} strokeWidth={1.8} />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
@@ -54,7 +54,7 @@ export default function PasswordRecovery({ reset = false }) {
           <div className="space-y-4">
             <p className="text-sm text-slate-600 bg-amber-50 border border-amber-200 p-4 rounded-2xl">
               Your reset link is missing or expired.{' '}
-              <Link className="text-[#67c4c7] font-bold underline" to="/forgot-password">Request a new link.</Link>
+              <Link className="text-[#226c72] font-bold underline" to="/forgot-password">Request a new link.</Link>
             </p>
           </div>
         ) : (
@@ -65,14 +65,14 @@ export default function PasswordRecovery({ reset = false }) {
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">New Password</label>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
-                    <input 
-                      autoComplete="new-password" 
-                      type="password" 
-                      required 
-                      minLength={8} 
-                      value={password} 
-                      onChange={e => setPassword(e.target.value)} 
-                      className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
+                    <input
+                      autoComplete="new-password"
+                      type="password"
+                      required
+                      minLength={8}
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                       placeholder="••••••••"
                     />
                   </div>
@@ -82,14 +82,14 @@ export default function PasswordRecovery({ reset = false }) {
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Confirm Password</label>
                   <div className="relative">
                     <ShieldCheck className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
-                    <input 
-                      autoComplete="new-password" 
-                      type="password" 
-                      required 
-                      minLength={8} 
-                      value={confirm} 
-                      onChange={e => setConfirm(e.target.value)} 
-                      className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
+                    <input
+                      autoComplete="new-password"
+                      type="password"
+                      required
+                      minLength={8}
+                      value={confirm}
+                      onChange={e => setConfirm(e.target.value)}
+                      className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
                       placeholder="••••••••"
                     />
                   </div>
@@ -100,22 +100,22 @@ export default function PasswordRecovery({ reset = false }) {
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
-                  <input 
-                    type="email" 
-                    required 
-                    autoComplete="email" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition" 
+                  <input
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full pl-11 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
                     placeholder="you@example.com"
                   />
                 </div>
               </div>
             )}
 
-            <button 
-              disabled={busy} 
-              className="w-full py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold rounded-xl transition shadow-md disabled:opacity-50 text-sm"
+            <button
+              disabled={busy}
+              className="w-full py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold rounded-xl transition shadow-md disabled:opacity-50 text-sm"
             >
               {busy ? 'Submitting...' : reset ? 'Update password' : 'Send reset link'}
             </button>
@@ -123,7 +123,7 @@ export default function PasswordRecovery({ reset = false }) {
         )}
 
         <div className="pt-4 border-t border-slate-100 text-center">
-          <Link className="text-xs font-bold text-[#67c4c7] hover:underline" to={user ? '/account' : '/login'}>
+          <Link className="text-xs font-bold text-[#226c72] hover:underline" to={user ? '/account' : '/login'}>
             Return to {user ? 'account' : 'login'}
           </Link>
         </div>

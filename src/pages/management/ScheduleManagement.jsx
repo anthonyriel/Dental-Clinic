@@ -1,3 +1,4 @@
+import { useAuth } from '../../context/auth'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../../services/supabaseClient'
@@ -13,6 +14,7 @@ import SlotPicker from '../../components/SlotPicker'
 import { RefreshCw, X } from 'lucide-react'
 
 export default function ScheduleManagement() {
+  const { role } = useAuth()
   const [params] = useSearchParams()
   const initialDate = params.get('date') || ''
   const initialStatus = params.get('status') || ''
@@ -31,7 +33,7 @@ export default function ScheduleManagement() {
   async function submit(e) {
     e.preventDefault()
     if (busy || !selected) return
-    
+
     if (selected.action !== 'delete' && !reason.trim()) return
     if (selected.action === 'completed' && totalPaid === null) {
       setError('Enter the amount paid for every service, using up to two decimal places. Enter 0 for a service with no charge.')
@@ -41,7 +43,7 @@ export default function ScheduleManagement() {
     setBusy(true); setError(''); setMessage('')
     try {
       if (selected.action === 'delete') {
-        await result(supabase.from('appointments').delete().eq('id', selected.appointment.id))
+        await result(supabase.rpc('delete_closed_appointment', {p_id:String(selected.appointment.id),p_version:selected.appointment.version}))
         setMessage('Appointment permanently deleted.')
       } else if (selected.action === 'completed') {
         await result(supabase.rpc('complete_appointment_services', {
@@ -68,36 +70,36 @@ export default function ScheduleManagement() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
+          <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">CLINIC WORKSPACE</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Schedule Management</h1>
           <p className="text-sm text-slate-600 mt-1 font-normal">Manage patient bookings, approve requests, and adjust clinic schedules. Refresh to see changes from other users. Your changes refresh this list automatically.</p>
         </div>
-        <button 
-          onClick={schedule.refresh} 
+        <button
+          onClick={schedule.refresh}
           disabled={schedule.loading}
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-xs hover:bg-slate-50 transition-colors disabled:opacity-50 self-start sm:self-auto"
         >
-          <RefreshCw size={16} className={schedule.loading ? 'animate-spin text-[#67c4c7]' : 'text-slate-400'} />
+          <RefreshCw size={16} className={schedule.loading ? 'animate-spin text-[#226c72]' : 'text-slate-400'} />
           Refresh Schedule
         </button>
       </div>
 
-      <Feedback 
-        error={error || schedule.error} 
-        message={message} 
-        onRetry={() => { setError(''); schedule.refresh() }} 
+      <Feedback
+        error={error || schedule.error}
+        message={message}
+        onRetry={() => { setError(''); schedule.refresh() }}
       />
 
       {schedule.loading ? (
         <p className="text-sm text-slate-500 font-normal py-8 text-center">Loading schedule...</p>
       ) : !schedule.error && (
         <div className="appointment-management-container">
-          <AppointmentList 
-            management 
-            appointments={schedule.data} 
+          <AppointmentList
+            management
+            appointments={schedule.data}
             initialDate={initialDate}
             initialStatus={initialStatus}
-            onDelete={a => { setSelected({ appointment: a, action: 'delete' }); setSlot(null); setReason(''); setPaidAmounts({}); setError('') }}
+            onDelete={['admin','owner'].includes(role) ? a => { setSelected({ appointment: a, action: 'delete' }); setSlot(null); setReason(''); setPaidAmounts({}); setError('') } : undefined}
             renderActions={a => {
               const actions = allowedActions(a);
 
@@ -106,13 +108,13 @@ export default function ScheduleManagement() {
               return (
                 <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-slate-100">
                   {actions.map(action => (
-                    <button 
-                      key={action} 
+                    <button
+                      key={action}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-colors shadow-2xs border ${
                         action === 'approve' || action === 'approve_cancellation' || action === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' :
                         action === 'cancel' || action === 'reject' ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' :
                         'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`} 
+                      }`}
                       onClick={() => { setSelected({ appointment: a, action }); setSlot(null); setReason(''); setPaidAmounts({}); setError('') }}
                     >
                       {statusLabel(action === 'completed' ? 'complete' : action)}
@@ -120,7 +122,7 @@ export default function ScheduleManagement() {
                   ))}
                 </div>
               );
-            }} 
+            }}
           />
         </div>
       )}
@@ -138,7 +140,7 @@ export default function ScheduleManagement() {
 
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div>
-                <span className="text-[10px] font-bold tracking-wider text-[#67c4c7] uppercase">
+                <span className="text-[10px] font-bold tracking-wider text-[#226c72] uppercase">
                   {selected.action === 'delete' ? 'DELETE APPOINTMENT' : 'UPDATE APPOINTMENT'}
                 </span>
                 <h2 className="text-xl font-extrabold text-slate-900 capitalize mt-1">
@@ -148,10 +150,10 @@ export default function ScheduleManagement() {
                   {selected.appointment.appointment_date} · {selected.appointment.time_slot}
                 </p>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 disabled={busy}
-                onClick={() => setSelected(null)} 
+                onClick={() => setSelected(null)}
                 className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
               >
                  <X size={20} />
@@ -170,12 +172,12 @@ export default function ScheduleManagement() {
               <>
                 {selected.action === 'reschedule' && (
                   <div className="bg-slate-50/50 border border-slate-200 rounded-2xl p-4">
-                    <SlotPicker 
+                    <SlotPicker
                       serviceId={selected.appointment.service_id}
-                      duration={selected.appointment.duration_minutes} 
-                      excludeId={selected.appointment.id} 
-                      value={slot} 
-                      onChange={setSlot} 
+                      duration={selected.appointment.duration_minutes}
+                      excludeId={selected.appointment.id}
+                      value={slot}
+                      onChange={setSlot}
                     />
                   </div>
                 )}
@@ -208,14 +210,14 @@ export default function ScheduleManagement() {
 
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide space-y-1.5">
                   Clinic Note <span className="text-red-500">*</span>
-                  <textarea 
-                    autoFocus={selected.action !== 'completed'} 
-                    required 
-                    maxLength={1000} 
-                    value={reason} 
-                    onChange={e => setReason(e.target.value)} 
+                  <textarea
+                    autoFocus={selected.action !== 'completed'}
+                    required
+                    maxLength={1000}
+                    value={reason}
+                    onChange={e => setReason(e.target.value)}
                     placeholder="Enter the reason or note for this action..."
-                    className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 resize-none transition" 
+                    className="block border border-slate-300 rounded-xl p-3 w-full text-sm font-normal focus:outline-none focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] text-slate-900 bg-slate-50/50 resize-none transition"
                     rows={4}
                   />
                 </label>
@@ -223,17 +225,17 @@ export default function ScheduleManagement() {
             )}
 
             <div className="flex items-center gap-3 pt-2">
-              <button 
-                type="button" 
-                disabled={busy} 
-                onClick={() => setSelected(null)} 
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setSelected(null)}
                 className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition text-sm disabled:opacity-50"
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
-                disabled={busy || (selected.action === 'reschedule' && !slot)} 
+              <button
+                type="submit"
+                disabled={busy || (selected.action === 'reschedule' && !slot)}
                 className={`flex-1 py-3 font-bold rounded-xl transition shadow-md text-sm disabled:opacity-50 text-white ${
                   selected.action === 'approve' || selected.action === 'approve_cancellation' || selected.action === 'completed' ? 'bg-emerald-600 hover:bg-emerald-500' :
                   selected.action === 'cancel' || selected.action === 'reject' || selected.action === 'delete' ? 'bg-red-600 hover:bg-red-500' :

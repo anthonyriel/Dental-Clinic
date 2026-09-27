@@ -7,7 +7,7 @@ export default function Contact() {
   return (
     <div className="space-y-12 max-w-7xl mx-auto pb-12 text-left">
       <div className="border-b border-slate-200/80 pb-6 space-y-2">
-        <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">GET IN TOUCH</span>
+        <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">GET IN TOUCH</span>
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">We're here for your smile</h1>
         <p className="text-sm text-slate-600 font-normal">Reach out to our team or visit us at our clinic in Guindulman.</p>
       </div>
@@ -17,7 +17,7 @@ export default function Contact() {
         <div className="lg:col-span-5 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-3xl p-8 shadow-sm space-y-6">
           <div className="space-y-4">
             <h2 className="text-xs font-bold tracking-widest text-slate-400 uppercase font-mono">Clinic Information</h2>
-            
+
             <div className="space-y-4 text-sm text-slate-600 font-normal">
               <div className="flex items-start gap-3">
                 <MapPin size={20} className="text-[#67c4c7] shrink-0 mt-0.5" />
@@ -66,28 +66,28 @@ export default function Contact() {
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm aspect-video bg-slate-100 relative">
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1083.8964633052221!2d124.49064656284963!3d9.763325025879622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33aa0b15e8935f6b%3A0x44ab53388f013ff2!2sDENTAPRIME%20DENTAL%20CLINIC!5e0!3m2!1sen!2sph!4v1788888338550!5m2!1sen!2sph" 
-              width="100%" 
-              height="100%" 
-              style={{ border: 0, display: 'block' }} 
-              allowFullScreen="" 
-              loading="lazy" 
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1083.8964633052221!2d124.49064656284963!3d9.763325025879622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33aa0b15e8935f6b%3A0x44ab53388f013ff2!2sDENTAPRIME%20DENTAL%20CLINIC!5e0!3m2!1sen!2sph!4v1788888338550!5m2!1sen!2sph"
+              width="100%"
+              height="100%"
+              style={{ border: 0, display: 'block' }}
+              allowFullScreen=""
+              loading="lazy"
               referrerPolicy="strict-origin-when-cross-origin"
             />
           </div>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <a 
-              href="https://maps.app.goo.gl/99MpiZahfAWqputv6" 
-              target="_blank" 
+            <a
+              href="https://maps.app.goo.gl/99MpiZahfAWqputv6"
+              target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold text-sm shadow-md transition-all"
             >
               Open in Google Maps <ArrowUpRight size={18} />
             </a>
-            <Link 
-              to="/dashboard/book" 
+            <Link
+              to="/dashboard/book"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all"
             >
               Book an appointment <ArrowUpRight size={18} />

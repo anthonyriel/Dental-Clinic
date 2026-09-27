@@ -21,16 +21,16 @@ export default function ServiceCard({ service, selected, onSelect }) {
   const content = (
     <>
       <div className="flex items-start justify-between gap-4">
-        <div className="p-3 rounded-2xl bg-[#67c4c7]/10 text-[#67c4c7] group-hover:bg-[#67c4c7]/20 transition-colors">
+        <div className="p-3 rounded-2xl bg-[#67c4c7]/10 text-[#226c72] group-hover:bg-[#67c4c7]/20 transition-colors">
           <ServiceIcon name={service.name} />
         </div>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold font-mono">
+        <span className="inline-flex shrink-0 items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold font-mono">
           <Clock size={13} /> {service.duration_minutes || 60} min
         </span>
       </div>
 
       <div className="space-y-1.5 my-4">
-        <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#67c4c7] transition-colors">{service.name}</h3>
+        <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#226c72] transition-colors">{service.name}</h3>
         <p className="text-sm text-slate-600 font-normal leading-relaxed line-clamp-2">
           {service.description || 'Talk to our team about the right care for your smile.'}
         </p>
@@ -45,32 +45,32 @@ export default function ServiceCard({ service, selected, onSelect }) {
             {priceLabel(service.price)}
           </strong>
         </div>
-        <span className="p-2.5 rounded-xl bg-slate-100 text-slate-500 group-hover:bg-[#67c4c7] group-hover:text-white transition-all shadow-2xs">
+        <span className="p-2.5 rounded-xl bg-slate-100 text-slate-500 group-hover:bg-[#67c4c7] group-hover:text-[#153438] transition-all shadow-2xs">
           <ArrowUpRight size={18} />
         </span>
       </div>
     </>
   )
 
-  const baseClasses = `w-full bg-white/90 backdrop-blur-md border rounded-3xl p-6 shadow-sm transition-all text-left flex flex-col justify-between group cursor-pointer ${
-    selected 
-      ? 'border-[#67c4c7] bg-[#67c4c7]/5 ring-2 ring-[#67c4c7]/20 shadow-md' 
+  const baseClasses = `w-full h-full bg-white/80 backdrop-blur-md border rounded-3xl p-6 shadow-sm transition-all text-left flex flex-col justify-between group cursor-pointer ${
+    selected
+      ? 'border-[#67c4c7] bg-[#67c4c7]/5 ring-2 ring-[#67c4c7]/20 shadow-md'
       : 'border-slate-200/80 hover:border-[#67c4c7]/50 hover:shadow-md'
   }`
 
   return onSelect ? (
-    <button 
-      type="button" 
-      onClick={() => onSelect(service.id)} 
-      aria-pressed={selected} 
+    <button
+      type="button"
+      onClick={() => onSelect(service.id)}
+      aria-pressed={selected}
       className={baseClasses}
     >
       {content}
     </button>
   ) : (
-    <Link 
-      to={user ? bookingPath : `/login?next=${encodeURIComponent(bookingPath)}`} 
-      className={baseClasses} 
+    <Link
+      to={user ? bookingPath : `/login?next=${encodeURIComponent(bookingPath)}`}
+      className={baseClasses}
       aria-label={`Book ${service.name}`}
     >
       {content}

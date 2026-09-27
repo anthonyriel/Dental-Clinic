@@ -81,11 +81,11 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-6 lg:p-8 selection:bg-[#67c4c7]/30 py-12">
-      <div className="max-w-3xl w-full bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-8 sm:p-12 shadow-xl space-y-8">
-        
+    <div className="auth-page flex items-center justify-center p-4 sm:p-6 lg:p-8 selection:bg-[#67c4c7]/30 py-12">
+      <div className="max-w-3xl w-full bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-3xl p-5 sm:p-12 shadow-xl space-y-8">
+
         <div className="text-center space-y-1">
-          <span className="text-[10px] font-bold tracking-widest text-[#67c4c7] uppercase">JOIN DENTAPRIME</span>
+          <span className="text-[10px] font-bold tracking-widest text-[#226c72] uppercase">JOIN DENTAPRIME</span>
           <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">Create an Account</h2>
           <p className="text-sm text-slate-500 font-normal">Join Dentaprime to book and manage your appointments</p>
         </div>
@@ -240,7 +240,7 @@ export default function Signup() {
           {/* Address Section */}
           <div className="border-t border-slate-100 pt-6 space-y-4">
             <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#67c4c7]" /> Philippine Address Directory
+              <MapPin className="w-4 h-4 text-[#226c72]" /> Philippine Address Directory
             </h3>
 
             <AddressFields value={formData} onChange={changes => setFormData(prev => ({ ...prev, ...changes }))} />
@@ -277,7 +277,7 @@ export default function Signup() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
-                  Subdivision or Purok 
+                  Subdivision or Purok
                 </label>
                 <input
                   type="text"
@@ -311,7 +311,7 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold rounded-xl transition shadow-md disabled:opacity-50 text-sm mt-4"
+            className="w-full py-3.5 bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold rounded-xl transition shadow-md disabled:opacity-50 text-sm mt-4"
           >
             {loading ? 'Creating account...' : 'Complete Sign Up'}
           </button>
@@ -319,7 +319,7 @@ export default function Signup() {
 
         <p className="text-center text-sm text-slate-500 font-normal">
           Already have an account?{' '}
-          <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'} className="text-[#67c4c7] font-bold hover:underline">
+          <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'} className="text-[#226c72] font-bold hover:underline">
             Sign in
           </Link>
         </p>

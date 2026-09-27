@@ -3,7 +3,7 @@ import { CalendarDays, Clock, CircleHelp, ListChecks, ArrowUpRight, PlusCircle, 
 import { useQuery } from '../../hooks/useQuery'
 import { supabase } from '../../services/supabaseClient'
 import { managementSummary } from '../../lib/managementSummary'
-import { clinicDate, serviceName, statusLabel, normalizeStatus, patientName } from '../../lib/appointments'
+import { clinicDate, serviceName, statusLabel, normalizeStatus, patientName, bookingSource } from '../../lib/appointments'
 import { visitDateLabel } from '../../lib/presentation'
 import Feedback from '../../components/Feedback'
 
@@ -24,8 +24,8 @@ export default function ManagementHome() {
     <div className="space-y-8 max-w-7xl mx-auto pb-12 text-left">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">CLINIC WORKSPACE</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"/> Refreshes every 30 seconds
             </span>
@@ -34,8 +34,8 @@ export default function ManagementHome() {
           <p className="text-sm sm:text-base text-slate-600 mt-1 font-normal">{visitDateLabel(clinicDate())} · Here’s what needs your attention.</p>
         </div>
         <div className="shrink-0 flex items-center gap-2">
-          <Link 
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white shadow-md transition-all whitespace-nowrap" 
+          <Link
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] shadow-md transition-all whitespace-nowrap"
             to="/management/schedule"
           >
             Open schedule <ArrowUpRight size={17}/>
@@ -46,21 +46,21 @@ export default function ManagementHome() {
       <Feedback error={schedule.error} onRetry={schedule.refresh}/>
 
       {!schedule.error && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
           {cards.map(([label, value, Icon, description, linkPath]) => (
-            <Link 
-              key={label} 
-              to={linkPath} 
+            <Link
+              key={label}
+              to={linkPath}
               className="bg-white/90 backdrop-blur-md border border-slate-200/80 p-4 sm:p-6 rounded-3xl shadow-sm flex flex-col justify-between hover:border-[#67c4c7]/50 transition group text-left"
             >
-              <div className="flex items-center justify-between text-[#67c4c7] mb-3 sm:mb-4">
+              <div className="flex items-center justify-between text-[#226c72] mb-3 sm:mb-4">
                 <div className="p-2.5 sm:p-3 rounded-2xl bg-[#67c4c7]/10 group-hover:bg-[#67c4c7]/20 transition-colors">
                   <Icon size={20} className="sm:w-5.5 sm:h-5.5"/>
                 </div>
-                <ArrowUpRight size={16} className="sm:w-4.5 sm:h-4.5 text-slate-400 group-hover:text-[#67c4c7] transition-colors"/>
+                <ArrowUpRight size={16} className="sm:w-4.5 sm:h-4.5 text-slate-400 group-hover:text-[#226c72] transition-colors"/>
               </div>
               <div className="space-y-1">
-                <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest block truncate">{label}</span>
+                <span className="stat-label text-[11px] sm:text-xs font-semibold text-slate-600 block">{label}</span>
                 <strong className="block text-2xl sm:text-3xl font-extrabold text-slate-900">{schedule.loading ? '—' : value}</strong>
                 <small className="block text-[11px] sm:text-xs text-slate-500 font-normal leading-tight">{description}</small>
               </div>
@@ -69,10 +69,10 @@ export default function ManagementHome() {
         </div>
       )}
 
-      <section className="bg-white/90 backdrop-blur-md mt-6 p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+      <section className="bg-white/90 backdrop-blur-md mt-6 p-5 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
         <div className="flex justify-between items-center gap-4 border-b border-slate-100 pb-4">
           <h2 className="font-bold text-lg text-slate-900">Today at the clinic</h2>
-          <Link className="inline-flex items-center gap-1 text-sm font-bold text-[#67c4c7] hover:underline" to={`/management/schedule?date=${clinicDate()}`}>
+          <Link className="inline-flex items-center gap-1 text-sm font-bold text-[#226c72] hover:underline" to={`/management/schedule?date=${clinicDate()}`}>
             View all <ArrowUpRight size={16}/>
           </Link>
         </div>
@@ -94,7 +94,7 @@ export default function ManagementHome() {
               <Link to="/management/settings" className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
                 <CalendarOff size={15}/> Manage closures &amp; hours
               </Link>
-              <Link to="/management/schedule" className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white text-xs font-bold transition shadow-2xs">
+              <Link to="/management/schedule" className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] text-xs font-bold transition shadow-2xs">
                 <PlusCircle size={15}/> View full schedule
               </Link>
             </div>
@@ -104,7 +104,7 @@ export default function ManagementHome() {
             {today.slice(0, 5).map(a => (
               <div key={a.id} className="flex flex-wrap gap-4 items-center justify-between py-4 first:pt-0 last:pb-0">
                 <div className="space-y-1">
-                  <h3 className="font-bold text-base text-slate-900">{patientName(a)}{a.walk_in_name ? ' · Walk-in' : ''}</h3>
+                  <h3 className="font-bold text-base text-slate-900">{patientName(a)} · {bookingSource(a)}</h3>
                   <p className="text-xs text-slate-500 font-medium">
                     {serviceName(a)} · <span className="text-slate-700 font-bold">
                       {normalizeStatus(a.status) === 'completed'

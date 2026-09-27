@@ -35,7 +35,7 @@ export default function Reports() {
   }
   return <div className="space-y-8 max-w-7xl mx-auto pb-12 text-left min-w-0">
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
-      <div><span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">CLINIC WORKSPACE</span>
+      <div><span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">CLINIC WORKSPACE</span>
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Reports</h1>
         <p className="text-sm text-slate-600 mt-1">A clearer picture of your clinic’s treatments and recorded payments.</p></div>
       <div className="flex flex-wrap gap-2"><button className={button} onClick={query.refresh} disabled={query.loading}><RefreshCw size={16}/>Refresh</button>
@@ -56,7 +56,7 @@ export default function Reports() {
     {ready && <>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {[[Banknote,'Recorded payments',priceLabel(report.revenue),'Sum of recorded completed-visit totals'],[CheckCircle2,'Completed visits',report.visits,'Each visit counted once'],[Stethoscope,'Treatments',report.treatments,'Each recorded service counted separately'],[BarChart3,'Average paid per visit',report.average==null?'—':priceLabel(report.average),`${report.paidVisits} visits with a recorded total`]].map(([Icon,label,value,note])=><div key={label} className={panel}>
-          <Icon size={23} className="text-[#67c4c7] mb-4"/><p className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</p><strong className="block text-2xl font-extrabold text-slate-900 mt-2 break-words">{value}</strong><p className="text-xs text-slate-500 mt-2">{note}</p></div>)}
+          <Icon size={23} className="text-[#226c72] mb-4"/><p className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</p><strong className="block text-2xl font-extrabold text-slate-900 mt-2 break-words">{value}</strong><p className="text-xs text-slate-500 mt-2">{note}</p></div>)}
       </div>
       {(report.missingLines>0 || report.missingTotals>0 || report.missingBreakdowns>0 || report.fallbackDates>0 || report.difference!==0) && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900 space-y-2">
         <h2 className="font-bold">Records to keep in mind</h2>
@@ -80,7 +80,7 @@ export default function Reports() {
         </section>
         <section className={panel}><h2 className="text-lg font-bold text-slate-900">Appointment outcomes</h2><p className="text-xs text-slate-500 mt-1 mb-5">Current statuses of {report.scheduled} appointments scheduled within the selected dates. This uses scheduled dates, so counts can differ from completed visits above.</p>
           <dl className="grid grid-cols-2 gap-3">{['pending','confirmed','completed','cancelled','cancellation_requested','no_show'].map(status=><div key={status} className="rounded-2xl bg-slate-50 border border-slate-100 p-3"><dt className="text-xs text-slate-500 capitalize">{statusLabel(status)}</dt><dd className="text-xl font-bold text-slate-900 mt-1">{report.statuses[status] || 0}</dd></div>)}</dl>
-          <p className="text-sm text-slate-600 border-t border-slate-100 pt-4 mt-5">Completed visits: <strong>{report.walkIns}</strong> walk-ins · <strong>{report.registered}</strong> registered-patient visits.</p>
+          <p className="text-sm text-slate-600 border-t border-slate-100 pt-4 mt-5">Completed visits: <strong>{report.walkIns}</strong> walk-ins · <strong>{report.registered}</strong> account-linked visits (may include walk-ins).</p>
         </section>
       </div>
       <p className="text-xs text-slate-500">Reports reflect records currently retained in the system. Permanently deleted appointments are not included. Payments are recorded at completion; these reports do not track refunds or expenses.</p>

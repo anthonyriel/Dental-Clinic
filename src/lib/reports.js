@@ -8,7 +8,7 @@ export function buildReport(completed, scheduled) {
   for (const visit of completed) {
     const date = visit.completed_at ? clinicDate(new Date(visit.completed_at)) : visit.appointment_date
     if (!visit.completed_at) fallbackDates++
-    if (visit.patient_id == null) walkIns++
+    if (visit.booking_source ? visit.booking_source === 'walk_in' : visit.patient_id == null) walkIns++
     const month = date.slice(0,7)
     if (!months.has(month)) months.set(month, {month, visits:0, cents:0})
     const trend = months.get(month)
@@ -33,7 +33,7 @@ export function buildReport(completed, scheduled) {
   for (const visit of scheduled) statuses[visit.status || 'unknown'] = (statuses[visit.status || 'unknown'] || 0) + 1
   return {
     revenue:total/100, allocated:allocated/100, difference:(total-allocated)/100,
-    visits:completed.length, treatments, walkIns, registered:completed.length-walkIns,
+    visits:completed.length, treatments, walkIns, registered:completed.filter(visit => visit.patient_id != null).length,
     average:paidVisits ? total/100/paidVisits : null, paidVisits,
     missingLines, missingTotals, missingBreakdowns, fallbackDates, statuses, scheduled:scheduled.length,
     services:[...services.values()].map(s=>({...s,visits:s.visits.size,revenue:s.cents/100,average:s.paidCount?s.cents/100/s.paidCount:null})).sort((a,b)=>b.revenue-a.revenue || a.name.localeCompare(b.name)),

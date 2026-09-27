@@ -3,7 +3,7 @@ import { allRows } from './queries'
 import { addDays } from './calendar'
 
 // Only report fields are fetched; no patient names, contact details or treatment notes.
-const fields = 'id,patient_id,appointment_date,completed_at,price,appointment_services(service_id,service_name,paid_amount)'
+const fields = 'id,patient_id,booking_source,appointment_date,completed_at,price,appointment_services(service_id,service_name,paid_amount)'
 export async function loadReport(from,to) {
   const end = addDays(to,1)
   const [dated,legacy,scheduled] = await Promise.all([

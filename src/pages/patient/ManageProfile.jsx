@@ -4,14 +4,14 @@ import { useAuth } from '../../context/auth'
 import AddressFields from '../../components/AddressFields'
 import AvatarCropper from '../../components/AvatarCropper'
 import { clinicDate } from '../../lib/appointments'
-import {  
-  User, Phone, Calendar, MapPin, Lock, Camera,  
-  AlertCircle, CheckCircle2, AtSign, Mail, Sliders, ShieldCheck  
+import {
+  User, Phone, Calendar, MapPin, Lock, Camera,
+  AlertCircle, CheckCircle2, AtSign, Mail, Sliders, ShieldCheck
 } from 'lucide-react'
 
 export default function ManageProfile() {
   const { user, profile, refreshProfile } = useAuth()
-  
+
   const [formData, setFormData] = useState(() => ({
     username: profile.username || '',
     fullName: profile.full_name || '',
@@ -50,9 +50,9 @@ export default function ManageProfile() {
   const handleFileSelect = (e) => {
     const file = e.target.files[0]
     if (!file) return
-    if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) { 
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
       setError('Choose a JPG, PNG or WebP image smaller than 5 MB.')
-      return 
+      return
     }
 
     const reader = new FileReader()
@@ -154,12 +154,12 @@ export default function ManageProfile() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">ACCOUNT SETTINGS</span>
+          <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">ACCOUNT SETTINGS</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Manage Profile</h1>
           <p className="text-sm text-slate-600 mt-1 font-normal">Update your professional profile credentials, residential address, and security settings.</p>
         </div>
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
-          <ShieldCheck className="w-4 h-4 text-[#67c4c7]" /> Secure Portal
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#226c72] rounded-full text-xs font-bold border border-[#67c4c7]/20 shadow-2xs self-start">
+          <ShieldCheck className="w-4 h-4 text-[#226c72]" /> Secure Portal
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default function ManageProfile() {
 
       {/* Main Profile Details Form */}
       <form onSubmit={handleUpdateProfile} className="bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-8">
-        
+
         {/* Avatar Header Component */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-slate-100 text-center sm:text-left">
           <div className="relative w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-4 border-[#67c4c7] shadow-inner shrink-0 flex items-center justify-center">
@@ -197,7 +197,7 @@ export default function ManageProfile() {
               <p className="text-xs text-slate-500 mt-0.5 font-normal">Upload a professional portrait or clear photo for your clinic profile.</p>
             </div>
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-              <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#67c4c7]/10 hover:bg-[#67c4c7]/20 text-[#67c4c7] rounded-xl text-xs font-bold cursor-pointer transition border border-[#67c4c7]/30 shadow-2xs">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#67c4c7]/10 hover:bg-[#67c4c7]/20 text-[#226c72] rounded-xl text-xs font-bold cursor-pointer transition border border-[#67c4c7]/30 shadow-2xs">
                 <Camera className="w-4 h-4" />
                 <span>Upload New Image</span>
                 <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
@@ -219,7 +219,7 @@ export default function ManageProfile() {
         {/* Personal Credentials */}
         <div className="space-y-4">
           <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Personal Information</h4>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
@@ -332,7 +332,7 @@ export default function ManageProfile() {
         <div className="border-t border-slate-200/80 pt-6 space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#67c4c7]" /> Philippine Address Directory
+              <MapPin className="w-4 h-4 text-[#226c72]" /> Philippine Address Directory
             </h4>
             <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">
               Saved Region: {formData.regionName || 'None selected'}
@@ -404,7 +404,7 @@ export default function ManageProfile() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 bg-[#67c4c7] text-white font-bold rounded-xl hover:bg-[#57b3b6] transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm mt-6"
+          className="w-full py-3.5 bg-[#67c4c7] text-[#153438] font-bold rounded-xl hover:bg-[#57b3b6] transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm mt-6"
         >
           {loading ? 'Saving Profile Changes...' : 'Save Profile Changes'}
         </button>

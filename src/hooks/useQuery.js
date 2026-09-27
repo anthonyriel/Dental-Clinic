@@ -11,7 +11,7 @@ export function useQuery(loader, initial = null, interval = 0, { refreshOnFocus 
         const data = await loader()
         if (!cancelled) setState({ data, loading: false, error: '', loader })
       } catch (error) {
-        if (!cancelled) setState(previous => ({ ...previous, loading: false, error: errorMessage(error), loader }))
+        if (!cancelled) setState(previous => ({ ...previous, data: previous.loader === loader ? previous.data : undefined, loading: false, error: errorMessage(error), loader }))
       }
     }
     run()
@@ -19,5 +19,5 @@ export function useQuery(loader, initial = null, interval = 0, { refreshOnFocus 
     if (refreshOnFocus) window.addEventListener('focus', refresh)
     return () => { cancelled = true; clearInterval(timer); window.removeEventListener('focus', refresh) }
   }, [loader, version, interval, refresh, refreshOnFocus])
-  return { ...state, data: state.loader === loader ? state.data : initial, loading: state.loader !== loader || state.loading, error: state.loader === loader ? state.error : '', refresh }
+  return { ...state, data: state.loader === loader ? state.data ?? initial : initial, loading: state.loader !== loader || state.loading, error: state.loader === loader ? state.error : '', refresh }
 }

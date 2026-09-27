@@ -17,29 +17,29 @@ export default function Home() {
       {/* Hero Section */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-4 lg:pt-10">
         <div className="lg:col-span-6 space-y-6 text-left lg:pr-8 xl:pr-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#67c4c7] rounded-full text-xs font-bold tracking-wider uppercase border border-[#67c4c7]/20 shadow-2xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#67c4c7]/10 text-[#226c72] rounded-full text-xs font-bold tracking-wider uppercase border border-[#67c4c7]/20 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-[#67c4c7] animate-pulse" /> Put your best self forward
           </div>
-          
+
           <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
-            A little care.<br />A <span className="text-[#67c4c7]">brighter</span> you<span className="text-[#67c4c7]">.</span>
+            A little care.<br />A <span className="text-[#226c72]">brighter</span> you<span className="text-[#226c72]">.</span>
           </h1>
-          
+
           <p className="text-base sm:text-lg text-slate-600 max-w-xl leading-relaxed font-normal">
             Feel good about your next dental visit. Personal care, a welcoming space, and a simpler way to make time for your smile.
           </p>
-          
+
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Link 
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all" 
+            <Link
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold text-sm shadow-md hover:shadow-lg transition-all"
               to="/services"
             >
               Explore our care <ArrowUpRight size={19}/>
             </Link>
           </div>
-          
+
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 pt-4">
-            <MapPin size={16} className="text-[#67c4c7]"/>
+            <MapPin size={16} className="text-[#226c72]"/>
             <span>Guindulman, Bohol <span className="text-slate-300 mx-1">·</span> Dr. Karen Galagatan</span>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function Home() {
           [CalendarDays, 'Your visit, simplified', 'Find a time that fits your day.']
         ].map(([Icon, title, copy]) => (
           <div key={title} className="flex items-start gap-4 text-left">
-            <div className="p-3 rounded-2xl bg-[#67c4c7]/10 text-[#67c4c7] shrink-0 border border-[#67c4c7]/20">
+            <div className="p-3 rounded-2xl bg-[#67c4c7]/10 text-[#226c72] shrink-0 border border-[#67c4c7]/20">
               <Icon size={24} strokeWidth={1.8}/>
             </div>
             <div className="space-y-1">
@@ -74,12 +74,12 @@ export default function Home() {
       <section className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 text-left border-b border-slate-200/80 pb-6">
           <div className="space-y-1">
-            <span className="text-xs font-bold tracking-wider text-[#67c4c7] uppercase">GOOD CARE. MORE REASONS TO SMILE.</span>
+            <span className="text-xs font-bold tracking-wider text-[#226c72] uppercase">GOOD CARE. MORE REASONS TO SMILE.</span>
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">A smile for every version of you.</h2>
           </div>
           <div className="space-y-2">
             <p className="text-sm text-slate-600 font-normal">From your regular checkup to your next smile goal, find the care that feels right.</p>
-            <Link to="/services" className="inline-flex items-center gap-1 text-sm font-bold text-[#67c4c7] hover:underline">
+            <Link to="/services" className="inline-flex items-center gap-1 text-sm font-bold text-[#226c72] hover:underline">
               View all services <ArrowUpRight size={18}/>
             </Link>
           </div>
@@ -101,7 +101,7 @@ export default function Home() {
 
         {!services.loading && !services.error && !services.data.some(s => s.is_active !== false) && (
           <div className="text-center py-12 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
-            <p className="text-sm text-slate-600 font-normal">Our team can help you find the right care. <Link to="/contact" className="text-[#67c4c7] font-bold underline">Get in touch.</Link></p>
+            <p className="text-sm text-slate-600 font-normal">Our team can help you find the right care. <Link to="/contact" className="text-[#226c72] font-bold underline">Get in touch.</Link></p>
           </div>
         )}
       </section>
@@ -113,9 +113,9 @@ export default function Home() {
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">Your next visit.<br/>One less thing to put off.</h2>
           <p className="text-slate-300 text-sm sm:text-base font-normal leading-relaxed">Choose your care, find your time, and leave the rest to us.</p>
           <div className="pt-2">
-            <Link 
-              to={bookPath} 
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-white font-bold text-sm shadow-md transition-all"
+            <Link
+              to={bookPath}
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#67c4c7] hover:bg-[#57b3b6] text-[#153438] font-bold text-sm shadow-md transition-all"
             >
               Find your reason to smile <ArrowUpRight size={18}/>
             </Link>

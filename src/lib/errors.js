@@ -1,3 +1,8 @@
+// Only explicit validation/transaction rejection makes it safe to abandon a request.
+export function bookingRequestRejected(error) {
+  return /^(22|23|28|42)/.test(error?.code || '') || ['P0001','40001','40P01','PGRST202','PGRST205'].includes(error?.code)
+}
+
 export function errorMessage(error) {
   if (error?.code === '23P01') return 'This visit overlaps another reserved appointment. Refresh availability and choose another time. (23P01)'
   if (error?.code === '23505') {

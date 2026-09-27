@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CalendarDays, Clock, Search, X, Trash2 } from 'lucide-react'
-import { appointmentServices, serviceName, servicePrice, statusLabel, normalizeStatus, patientName, patientPhone } from '../lib/appointments'
+import { appointmentServices, serviceName, servicePrice, statusLabel, normalizeStatus, patientName, patientPhone, bookingSource } from '../lib/appointments'
 import { priceLabel } from '../lib/presentation'
 
 export default function AppointmentList({ appointments, management = false, renderActions, initialDate = '', initialStatus = '', onDelete }) {
@@ -9,10 +9,10 @@ export default function AppointmentList({ appointments, management = false, rend
   const [status, setStatus] = useState(initialStatus)
   const [page, setPage] = useState(0)
 
-  const filtered = appointments.filter(a => 
-    (!date || a.appointment_date === date) && 
-    (!status || statusLabel(a.status) === status) && 
-    `${serviceName(a)} ${patientName(a)} ${patientPhone(a)} ${a.walk_in_name ? 'walk-in' : ''}`.toLowerCase().includes(search.toLowerCase())
+  const filtered = appointments.filter(a =>
+    (!date || a.appointment_date === date) &&
+    (!status || statusLabel(a.status) === status) &&
+    `${serviceName(a)} ${patientName(a)} ${patientPhone(a)} ${bookingSource(a)}`.toLowerCase().includes(search.toLowerCase())
   )
 
   const currentPage = Math.min(page, Math.max(0, Math.ceil(filtered.length / 20) - 1))
@@ -36,28 +36,28 @@ export default function AppointmentList({ appointments, management = false, rend
       <div className="bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col lg:flex-row items-center gap-4">
         <div className="relative w-full flex-1">
           <Search className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
-          <input 
-            aria-label="Search appointments" 
-            placeholder={management ? 'Search patient or service...' : 'Search your appointments...'} 
-            value={search} 
-            onChange={e => { setSearch(e.target.value); setPage(0) }} 
-            className="w-full pl-10 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition" 
+          <input
+            aria-label="Search appointments"
+            placeholder={management ? 'Search patient or service...' : 'Search your appointments...'}
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0) }}
+            className="w-full pl-10 pr-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-          <input 
-            aria-label="Filter appointment date" 
-            type="date" 
-            value={date} 
-            onChange={e => { setDate(e.target.value); setPage(0) }} 
-            className="px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono" 
+          <input
+            aria-label="Filter appointment date"
+            type="date"
+            value={date}
+            onChange={e => { setDate(e.target.value); setPage(0) }}
+            className="px-4 py-2.5 text-sm font-normal border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-900 transition font-mono"
           />
 
-          <select 
-            aria-label="Filter appointment status" 
-            value={status} 
-            onChange={e => { setStatus(e.target.value); setPage(0) }} 
+          <select
+            aria-label="Filter appointment status"
+            value={status}
+            onChange={e => { setStatus(e.target.value); setPage(0) }}
             className="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#67c4c7]/20 focus:border-[#67c4c7] outline-none bg-slate-50/50 text-slate-700 transition capitalize cursor-pointer"
           >
             <option value="">All statuses</option>
@@ -67,9 +67,9 @@ export default function AppointmentList({ appointments, management = false, rend
           </select>
 
           {(search || date || status) && (
-            <button 
-              type="button" 
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold text-slate-600 hover:text-[#67c4c7] bg-slate-100 hover:bg-slate-200 rounded-xl transition" 
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold text-slate-600 hover:text-[#67c4c7] bg-slate-100 hover:bg-slate-200 rounded-xl transition"
               onClick={() => { setSearch(''); setDate(''); setStatus(''); setPage(0) }}
             >
               <X size={14} /> Clear
@@ -110,7 +110,7 @@ export default function AppointmentList({ appointments, management = false, rend
                     <div className="space-y-1.5 min-w-0 flex-1">
                       {management && (
                         <p className="text-xs font-bold text-[#67c4c7] uppercase tracking-wider truncate">
-                          {patientName(a)} {a.walk_in_name && <span className="text-slate-700">(Walk-in)</span>} · <span className="font-mono text-slate-600">{patientPhone(a) || 'No phone listed'}</span>
+                          {patientName(a)} <span className="text-slate-700">({bookingSource(a)})</span> · <span className="font-mono text-slate-600">{patientPhone(a) || 'No phone listed'}</span>
                         </p>
                       )}
                       <h3 className="font-extrabold text-base text-slate-900 wrap-break-word">{serviceName(a)}</h3>
@@ -126,7 +126,7 @@ export default function AppointmentList({ appointments, management = false, rend
                           ))}
                         </ul>
                       )}
-                      
+
                       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
                         {statusNorm === 'completed' && a.completed_at ? (
                           <span className="inline-flex items-center gap-1 font-mono text-emerald-700">
@@ -173,7 +173,7 @@ export default function AppointmentList({ appointments, management = false, rend
                         {statusLabel(a.status)}
                       </span>
                       {management && (statusNorm === 'cancelled' || statusNorm === 'no_show') && onDelete && (
-                        <button 
+                        <button
                           type="button"
                           onClick={() => onDelete(a)}
                           className="p-1.5 rounded-full bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition shadow-2xs"
@@ -202,8 +202,8 @@ export default function AppointmentList({ appointments, management = false, rend
       {/* Pagination */}
       {filtered.length > 0 && (
         <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 text-sm font-medium text-slate-600">
-          <button 
-            disabled={currentPage === 0} 
+          <button
+            disabled={currentPage === 0}
             onClick={() => setPage(currentPage - 1)}
             className="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition disabled:opacity-40 disabled:cursor-not-allowed font-bold text-xs shadow-2xs"
           >
@@ -212,8 +212,8 @@ export default function AppointmentList({ appointments, management = false, rend
           <span className="bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono">
             Page {currentPage + 1} · {filtered.length} appointments
           </span>
-          <button 
-            disabled={(currentPage + 1) * 20 >= filtered.length} 
+          <button
+            disabled={(currentPage + 1) * 20 >= filtered.length}
             onClick={() => setPage(currentPage + 1)}
             className="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition disabled:opacity-40 disabled:cursor-not-allowed font-bold text-xs shadow-2xs"
           >

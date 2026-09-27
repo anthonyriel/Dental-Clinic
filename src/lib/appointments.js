@@ -40,6 +40,7 @@ export function allowedActions(appointment, now = new Date()) {
 
 export const appointmentServices = appointment => [...(appointment.appointment_services || [])].sort((a, b) => a.position - b.position)
 export const serviceName = (appointment) => appointmentServices(appointment).map(s => s.service_name).join(' + ') || appointment.service_name || appointment.services?.name || 'Dental service'
-export const patientName = (appointment) => appointment.walk_in_name || appointment.profiles?.full_name || 'Patient'
-export const patientPhone = (appointment) => appointment.walk_in_phone || appointment.profiles?.phone || ''
+export const patientName = (appointment) => appointment.client_records?.full_name || appointment.walk_in_name || appointment.profiles?.full_name || 'Patient'
+export const patientPhone = (appointment) => appointment.client_records ? appointment.client_records.phone || '' : appointment.walk_in_phone || appointment.profiles?.phone || ''
+export const bookingSource = appointment => ({walk_in:'Walk-in',call:'Phone call',text:'Text message',online:'Online'})[appointment.booking_source] || (appointment.walk_in_name ? 'Walk-in' : 'Online')
 export const servicePrice = (appointment) => appointment.price ?? appointment.quoted_price ?? appointment.services?.price
